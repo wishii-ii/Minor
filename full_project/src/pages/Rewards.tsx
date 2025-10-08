@@ -1,0 +1,154 @@
+import React, { useState } from 'react';
+import { Gift, Star, Crown, Sparkles } from 'lucide-react';
+import { useUser } from '../contexts/UserContext';
+
+export const Rewards: React.FC = () => {
+  const { user } = useUser();
+  const [selectedCategory, setSelectedCategory] = useState<'avatars' | 'treats' | 'themes'>('avatars');
+  
+  // Mock currency system - could be XP points or separate reward points
+  const rewardPoints = 450;
+
+  const rewards = {
+    avatars: [
+      { id: 1, name: 'Wizard Robes', price: 100, owned: true, icon: '🧙‍♂️', rarity: 'common' },
+      { id: 2, name: 'Knight Armor', price: 200, owned: false, icon: '⚔️', rarity: 'rare' },
+      { id: 3, name: 'Dragon Wings', price: 500, owned: false, icon: '🐉', rarity: 'legendary' },
+      { id: 4, name: 'Phoenix Feathers', price: 300, owned: false, icon: '🔥', rarity: 'epic' },
+    ],
+    treats: [
+      { id: 5, name: 'Coffee Break', price: 50, owned: false, icon: '☕', rarity: 'common', description: 'Treat yourself to your favorite coffee' },
+      { id: 6, name: 'Movie Night', price: 150, owned: false, icon: '🎬', rarity: 'rare', description: 'Enjoy a relaxing movie evening' },
+      { id: 7, name: 'Spa Day', price: 400, owned: false, icon: '🧘‍♀️', rarity: 'legendary', description: 'A full day of self-care and relaxation' },
+    ],
+    themes: [
+      { id: 8, name: 'Dark Mode', price: 75, owned: true, icon: '🌙', rarity: 'common' },
+      { id: 9, name: 'Forest Theme', price: 125, owned: false, icon: '🌲', rarity: 'rare' },
+      { id: 10, name: 'Galaxy Theme', price: 250, owned: false, icon: '✨', rarity: 'epic' },
+    ]
+  };
+
+  const rarityColors = {
+    common: 'border-gray-300 bg-gray-50',
+    rare: 'border-blue-300 bg-blue-50',
+    epic: 'border-purple-300 bg-purple-50',
+    legendary: 'border-yellow-300 bg-yellow-50'
+  };
+
+  return (
+    <div className="p-6 max-w-6xl mx-auto">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">Rewards Shop</h1>
+          <p className="text-gray-600">Exchange your progress for amazing rewards</p>
+        </div>
+        
+        <div className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-6 py-3 rounded-xl">
+          <div className="flex items-center gap-2">
+            <Star className="w-5 h-5" />
+            <span className="font-semibold">{rewardPoints} Points</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Categories */}
+      <div className="flex gap-4 mb-8">
+        {[
+          { key: 'avatars', label: 'Avatars', icon: <Crown className="w-5 h-5" /> },
+          { key: 'treats', label: 'Real-Life Treats', icon: <Gift className="w-5 h-5" /> },
+          { key: 'themes', label: 'Themes', icon: <Sparkles className="w-5 h-5" /> }
+        ].map((category) => (
+          <button
+            key={category.key}
+            onClick={() => setSelectedCategory(category.key as any)}
+            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
+              selectedCategory === category.key
+                ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-lg'
+                : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+            }`}
+          >
+            {category.icon}
+            {category.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Rewards Grid */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {rewards[selectedCategory].map((reward) => (
+          <RewardCard
+            key={reward.id}
+            reward={reward}
+            userPoints={rewardPoints}
+            canAfford={rewardPoints >= reward.price}
+            rarityStyle={rarityColors[reward.rarity]}
+          />
+        ))}
+      </div>
+
+      {/* Earning Tips */}
+      <div className="mt-12 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-6 border border-purple-200">
+        <h3 className="text-lg font-bold text-gray-800 mb-2">💡 How to Earn More Points</h3>
+        <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
+          <div>
+            <p>• Complete daily habits (+10-20 points each)</p>
+            <p>• Maintain streaks (+5 bonus per day)</p>
+            <p>• Participate in quests (+50-100 points)</p>
+          </div>
+          <div>
+            <p>• Achieve milestones (+25-200 points)</p>
+            <p>• Help team members (+10 points)</p>
+            <p>• Weekly consistency bonus (+50 points)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const RewardCard: React.FC<{
+  reward: any;
+  userPoints: number;
+  canAfford: boolean;
+  rarityStyle: string;
+}> = ({ reward, userPoints, canAfford, rarityStyle }) => {
+  return (
+    <div className={`rounded-xl p-4 border-2 shadow-md hover:shadow-lg transition-all duration-200 ${rarityStyle}`}>
+      <div className="text-center mb-4">
+        <div className="text-4xl mb-2">{reward.icon}</div>
+        <h3 className="font-bold text-gray-800">{reward.name}</h3>
+        {reward.description && (
+          <p className="text-sm text-gray-600 mt-1">{reward.description}</p>
+        )}
+      </div>
+
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-1">
+          <Star className="w-4 h-4 text-yellow-500" />
+          <span className="font-semibold text-gray-800">{reward.price}</span>
+        </div>
+        <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+          reward.rarity === 'common' ? 'bg-gray-200 text-gray-700' :
+          reward.rarity === 'rare' ? 'bg-blue-200 text-blue-700' :
+          reward.rarity === 'epic' ? 'bg-purple-200 text-purple-700' :
+          'bg-yellow-200 text-yellow-700'
+        }`}>
+          {reward.rarity}
+        </span>
+      </div>
+
+      <button
+        disabled={reward.owned || !canAfford}
+        className={`w-full py-2 rounded-lg font-medium transition-all duration-200 ${
+          reward.owned
+            ? 'bg-green-100 text-green-700 cursor-default'
+            : canAfford
+            ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:shadow-lg'
+            : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+        }`}
+      >
+        {reward.owned ? 'Owned' : canAfford ? 'Purchase' : 'Insufficient Points'}
+      </button>
+    </div>
+  );
+};
