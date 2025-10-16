@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { MobileNav } from './components/MobileNav';
 import { Dashboard } from './pages/Dashboard';
-import { Habits } from './pages/Habits';
+import Habits from './pages/Habits';
 import { Progress } from './pages/Progress';
 import { Achievements } from './pages/Achievements';
 import { Quests } from './pages/Quests';
@@ -29,6 +29,7 @@ function App() {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
@@ -89,21 +90,25 @@ function App() {
           {isAuthenticated && (
             <>
               {!isMobile && (
-                <Sidebar 
-                  currentPage={currentPage} 
-                  onPageChange={setCurrentPage} 
+                <Sidebar
+                  currentPage={currentPage}
+                  onPageChange={setCurrentPage}
                 />
               )}
               {isMobile && (
-                <MobileNav 
-                  currentPage={currentPage} 
-                  onPageChange={setCurrentPage} 
+                <MobileNav
+                  currentPage={currentPage}
+                  onPageChange={setCurrentPage}
                 />
               )}
             </>
           )}
-          
-          <main className={`${isAuthenticated && !isMobile ? 'ml-64' : ''} ${isAuthenticated && isMobile ? 'pb-20' : ''} transition-all duration-200`}>
+
+          <main
+            className={`${isAuthenticated && !isMobile ? 'ml-64' : ''
+              } ${isAuthenticated && isMobile ? 'pb-20' : ''
+              } transition-all duration-200`}
+          >
             {renderPage()}
           </main>
         </div>
