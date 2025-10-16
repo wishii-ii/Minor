@@ -1,5 +1,7 @@
+
 import React from 'react';
-import { TrendingUp, Calendar, Target, Award } from 'lucide-react';
+import { FaCheckCircle, FaFire, FaChartLine, FaMedal, FaChartBar } from 'react-icons/fa';
+
 import { useData } from '../contexts/DataContext';
 import { useUser } from '../contexts/UserContext';
 
@@ -8,8 +10,8 @@ export const Progress: React.FC = () => {
   const { user } = useUser();
 
   const totalCompletions = habits.reduce((sum, habit) => sum + habit.completions, 0);
-  const averageStreak = habits.length > 0 
-    ? Math.round(habits.reduce((sum, habit) => sum + habit.streak, 0) / habits.length)
+  const averageStreak = habits.length > 0
+    ? Math.round(habits.reduce((sum, habit) => sum + (habit.streak ?? 0), 0) / habits.length)
     : 0;
 
   return (
@@ -22,28 +24,28 @@ export const Progress: React.FC = () => {
       {/* Summary Stats */}
       <div className="grid md:grid-cols-4 gap-6 mb-8">
         <StatCard
-          icon={<TrendingUp className="w-6 h-6" />}
+          icon={<FaCheckCircle />}
           title="Total Completions"
           value={totalCompletions.toString()}
           subtitle="all time"
           color="from-blue-500 to-indigo-600"
         />
         <StatCard
-          icon={<Calendar className="w-6 h-6" />}
+          icon={<FaFire />}
           title="Current Streak"
           value={user?.streakCount.toString() || '0'}
           subtitle="days"
           color="from-green-500 to-emerald-600"
         />
         <StatCard
-          icon={<Target className="w-6 h-6" />}
+          icon={<FaChartLine />}
           title="Average Streak"
           value={averageStreak.toString()}
           subtitle="per habit"
           color="from-purple-500 to-pink-600"
         />
         <StatCard
-          icon={<Award className="w-6 h-6" />}
+          icon={<FaMedal />}
           title="Current Level"
           value={user?.level.toString() || '1'}
           subtitle={`${user?.xp || 0} XP`}
@@ -83,12 +85,12 @@ export const Progress: React.FC = () => {
                   <div className="grid grid-cols-4 gap-4 items-center">
                     <div>
                       <p className="font-medium text-gray-800">{habit.title}</p>
-                      <p className="text-sm text-gray-500">{habit.category}</p>
+                      <p className="text-sm text-gray-500">{habit.category ?? ''}</p>
                     </div>
                     <span className="text-gray-600">{habit.completions}</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-gray-600">{habit.streak}</span>
-                      {habit.streak > 7 && (
+                      <span className="text-gray-600">{habit.streak ?? 0}</span>
+                      {(habit.streak ?? 0) > 7 && (
                         <span className="text-orange-500">🔥</span>
                       )}
                     </div>
@@ -141,7 +143,7 @@ const ChartCard: React.FC<{
       <p className="text-gray-600 text-sm mb-4">{description}</p>
       <div className="h-64 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-lg flex items-center justify-center">
         <div className="text-center text-gray-500">
-          <TrendingUp className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+          <FaChartBar className="mx-auto mb-2 text-3xl text-purple-200" />
           <p>Chart visualization would go here</p>
           <p className="text-sm">Interactive progress charts coming soon</p>
         </div>

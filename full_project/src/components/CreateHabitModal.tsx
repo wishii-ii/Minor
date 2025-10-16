@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { FaTimes } from 'react-icons/fa';
 import { useData } from '../contexts/DataContext';
-import { X } from 'lucide-react';
+
 
 interface CreateHabitModalProps {
   onClose: () => void;
@@ -39,8 +40,9 @@ export const CreateHabitModal: React.FC<CreateHabitModalProps> = ({ onClose }) =
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
+            aria-label="Close"
           >
-            <X className="w-6 h-6" />
+            <FaTimes size={20} />
           </button>
         </div>
 

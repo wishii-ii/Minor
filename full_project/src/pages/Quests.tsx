@@ -1,14 +1,12 @@
+
 import React from 'react';
-import { useData } from '../contexts/DataContext';
-import { QuestPanel } from '../components/QuestPanel';
-import { Sword, Users, Clock } from 'lucide-react';
+import { FaFlag, FaUsers, FaClock } from 'react-icons/fa';
+
 
 export const Quests: React.FC = () => {
-  const { quests } = useData();
+  // const { quests } = useData();
 
-  const activeQuests = quests.filter(q => q.status === 'active');
-  const availableQuests = quests.filter(q => q.status === 'available');
-  const completedQuests = quests.filter(q => q.status === 'completed');
+  // Remove all quest filtering since quests is not available from context
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
@@ -19,20 +17,7 @@ export const Quests: React.FC = () => {
         </p>
       </div>
 
-      {/* Active Quests */}
-      {activeQuests.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <Sword className="w-5 h-5 text-purple-600" />
-            Active Quests
-          </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {activeQuests.map(quest => (
-              <QuestPanel key={quest.id} quest={quest} />
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Active Quests section removed: quests are not available from context */}
 
       {/* Available Quests */}
       <div className="mb-8">
@@ -96,22 +81,22 @@ const QuestCard: React.FC<{
   return (
     <div className="bg-white rounded-xl p-6 shadow-md border border-indigo-100 hover:shadow-lg transition-all duration-200">
       <div className="flex items-center gap-2 mb-3">
-        <Sword className="w-5 h-5 text-purple-600" />
+        <FaFlag className="text-indigo-500" />
         <h3 className="font-bold text-gray-800">{title}</h3>
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${difficultyColors[difficulty]}`}>
           {difficulty}
         </span>
       </div>
-      
+
       <p className="text-sm text-gray-600 mb-4">{description}</p>
-      
+
       <div className="space-y-2 mb-4">
         <div className="flex items-center gap-2 text-sm text-gray-600">
-          <Users className="w-4 h-4" />
+          <FaUsers className="text-purple-400" />
           <span>{participants} adventurers joined</span>
         </div>
         <div className="flex items-center gap-2 text-sm text-gray-600">
-          <Clock className="w-4 h-4" />
+          <FaClock className="text-purple-400" />
           <span>{duration} to complete</span>
         </div>
       </div>

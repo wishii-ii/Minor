@@ -1,5 +1,7 @@
+
 import React from 'react';
-import { User, Bell, Palette, Shield, Download, Moon } from 'lucide-react';
+import { FaUser, FaBell, FaPalette, FaLock, FaDatabase } from 'react-icons/fa';
+
 import { useUser } from '../contexts/UserContext';
 
 export const Settings: React.FC = () => {
@@ -16,7 +18,7 @@ export const Settings: React.FC = () => {
         {/* Profile Settings */}
         <SettingsSection
           title="Profile"
-          icon={<User className="w-5 h-5" />}
+          icon={<FaUser />}
         >
           <div className="grid md:grid-cols-2 gap-6">
             <div>
@@ -47,7 +49,7 @@ export const Settings: React.FC = () => {
         {/* Notifications */}
         <SettingsSection
           title="Notifications"
-          icon={<Bell className="w-5 h-5" />}
+          icon={<FaBell />}
         >
           <div className="space-y-4">
             <ToggleSetting
@@ -76,7 +78,7 @@ export const Settings: React.FC = () => {
         {/* Appearance */}
         <SettingsSection
           title="Appearance"
-          icon={<Palette className="w-5 h-5" />}
+          icon={<FaPalette />}
         >
           <div className="space-y-4">
             <div>
@@ -100,7 +102,7 @@ export const Settings: React.FC = () => {
         {/* Privacy */}
         <SettingsSection
           title="Privacy"
-          icon={<Shield className="w-5 h-5" />}
+          icon={<FaLock />}
         >
           <div className="space-y-4">
             <ToggleSetting
@@ -124,7 +126,7 @@ export const Settings: React.FC = () => {
         {/* Data & Export */}
         <SettingsSection
           title="Data & Export"
-          icon={<Download className="w-5 h-5" />}
+          icon={<FaDatabase />}
         >
           <div className="space-y-4">
             <div>
@@ -197,11 +199,10 @@ const ThemeOption: React.FC<{
 }> = ({ name, active }) => {
   return (
     <button
-      className={`p-3 rounded-lg border-2 font-medium transition-all duration-200 ${
-        active
-          ? 'border-purple-500 bg-purple-50 text-purple-700'
-          : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-      }`}
+      className={`p-3 rounded-lg border-2 font-medium transition-all duration-200 ${active
+        ? 'border-purple-500 bg-purple-50 text-purple-700'
+        : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+        }`}
     >
       {name}
     </button>

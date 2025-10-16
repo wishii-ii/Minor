@@ -1,5 +1,7 @@
+
 import React, { useState } from 'react';
-import { Send, Smile, Users } from 'lucide-react';
+import { FaUsers, FaPaperclip, FaPaperPlane } from 'react-icons/fa';
+
 
 export const Messages: React.FC = () => {
   const [selectedConversation, setSelectedConversation] = useState('team-1');
@@ -42,21 +44,20 @@ export const Messages: React.FC = () => {
           <div className="p-4 border-b border-gray-100">
             <h2 className="font-bold text-gray-800">Conversations</h2>
           </div>
-          
+
           <div className="overflow-y-auto h-full">
             {conversations.map((conversation) => (
               <button
                 key={conversation.id}
                 onClick={() => setSelectedConversation(conversation.id)}
-                className={`w-full p-4 text-left border-b border-gray-100 hover:bg-gray-50 transition-colors ${
-                  selectedConversation === conversation.id ? 'bg-purple-50 border-r-4 border-r-purple-500' : ''
-                }`}
+                className={`w-full p-4 text-left border-b border-gray-100 hover:bg-gray-50 transition-colors ${selectedConversation === conversation.id ? 'bg-purple-50 border-r-4 border-r-purple-500' : ''
+                  }`}
               >
                 <div className="flex items-center gap-3">
                   <div className="relative">
                     <span className="text-2xl">{conversation.avatar}</span>
                     {conversation.type === 'team' && (
-                      <Users className="w-3 h-3 text-gray-500 absolute -bottom-1 -right-1" />
+                      <FaUsers className="absolute -bottom-2 -right-2 text-purple-400 bg-white rounded-full p-0.5" size={16} />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -103,11 +104,10 @@ export const Messages: React.FC = () => {
                   {!message.isOwn && (
                     <p className="text-sm font-medium text-gray-700 mb-1">{message.sender}</p>
                   )}
-                  <div className={`rounded-lg p-3 ${
-                    message.isOwn 
-                      ? 'bg-purple-500 text-white' 
-                      : 'bg-gray-100 text-gray-800'
-                  }`}>
+                  <div className={`rounded-lg p-3 ${message.isOwn
+                    ? 'bg-purple-500 text-white'
+                    : 'bg-gray-100 text-gray-800'
+                    }`}>
                     <p>{message.message}</p>
                   </div>
                   <p className="text-xs text-gray-500 mt-1">{message.time}</p>
@@ -129,14 +129,16 @@ export const Messages: React.FC = () => {
               <button
                 type="button"
                 className="p-2 text-gray-500 hover:text-purple-600 transition-colors"
+                title="Attach file"
               >
-                <Smile className="w-6 h-6" />
+                <FaPaperclip />
               </button>
               <button
                 type="submit"
                 className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white p-2 rounded-lg hover:shadow-lg transition-all duration-200"
+                title="Send"
               >
-                <Send className="w-6 h-6" />
+                <FaPaperPlane />
               </button>
             </div>
           </form>

@@ -1,7 +1,8 @@
 import React from 'react';
+import { FaMedal, FaCalendarAlt, FaCheckCircle, FaFire, FaTrophy, FaUsers } from 'react-icons/fa';
 import { useUser } from '../contexts/UserContext';
 import { useData } from '../contexts/DataContext';
-import { Calendar, Award, Target, TrendingUp, Users } from 'lucide-react';
+
 
 export const Profile: React.FC = () => {
   const { user } = useUser();
@@ -11,9 +12,9 @@ export const Profile: React.FC = () => {
 
   const totalCompletions = habits.reduce((sum, habit) => sum + habit.completions, 0);
   const earnedAchievements = achievements.filter(a => a.earned);
-  const joinDate = new Date(user.joinDate).toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'long' 
+  const joinDate = new Date(user.joinDate).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long'
   });
 
   return (
@@ -28,18 +29,17 @@ export const Profile: React.FC = () => {
             <h1 className="text-3xl font-bold mb-2">{user.displayName}</h1>
             <div className="flex items-center gap-6 text-purple-100">
               <div className="flex items-center gap-2">
-                <Award className="w-5 h-5" />
+                <FaMedal />
                 <span>Level {user.level}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Calendar className="w-5 h-5" />
+                <FaCalendarAlt />
                 <span>Joined {joinDate}</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className={`w-3 h-3 rounded-full ${
-                  user.status === 'online' ? 'bg-green-400' : 
+                <div className={`w-3 h-3 rounded-full ${user.status === 'online' ? 'bg-green-400' :
                   user.status === 'away' ? 'bg-yellow-400' : 'bg-gray-400'
-                }`} />
+                  }`} />
                 <span className="capitalize">{user.status}</span>
               </div>
             </div>
@@ -67,28 +67,28 @@ export const Profile: React.FC = () => {
           <h2 className="text-xl font-bold text-gray-800 mb-4">Statistics</h2>
           <div className="grid md:grid-cols-2 gap-4 mb-8">
             <StatCard
-              icon={<Target className="w-6 h-6" />}
+              icon={<FaCheckCircle />}
               title="Total Completions"
               value={totalCompletions.toString()}
               subtitle="across all habits"
               color="from-blue-500 to-indigo-600"
             />
             <StatCard
-              icon={<TrendingUp className="w-6 h-6" />}
+              icon={<FaFire />}
               title="Current Streak"
               value={user.streakCount.toString()}
               subtitle="days in a row"
               color="from-green-500 to-emerald-600"
             />
             <StatCard
-              icon={<Award className="w-6 h-6" />}
+              icon={<FaTrophy />}
               title="Achievements"
               value={earnedAchievements.length.toString()}
               subtitle={`of ${achievements.length} total`}
               color="from-purple-500 to-pink-600"
             />
             <StatCard
-              icon={<Users className="w-6 h-6" />}
+              icon={<FaUsers />}
               title="Team Contributions"
               value="47"
               subtitle="quest points earned"
@@ -138,12 +138,11 @@ export const Profile: React.FC = () => {
                 className="bg-white rounded-xl p-4 shadow-md border border-indigo-100"
               >
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg ${
-                    achievement.tier === 'gold' ? 'bg-yellow-100 text-yellow-600' :
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg ${achievement.tier === 'gold' ? 'bg-yellow-100 text-yellow-600' :
                     achievement.tier === 'silver' ? 'bg-gray-100 text-gray-600' :
-                    achievement.tier === 'bronze' ? 'bg-orange-100 text-orange-600' :
-                    'bg-purple-100 text-purple-600'
-                  }`}>
+                      achievement.tier === 'bronze' ? 'bg-orange-100 text-orange-600' :
+                        'bg-purple-100 text-purple-600'
+                    }`}>
                     {achievement.icon}
                   </div>
                   <div>

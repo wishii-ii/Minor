@@ -1,5 +1,7 @@
+
 import React from 'react';
-import { Users, Plus, Crown, Star } from 'lucide-react';
+import { FaUsers, FaCrown, FaUser } from 'react-icons/fa';
+
 
 export const Teams: React.FC = () => {
   return (
@@ -9,9 +11,9 @@ export const Teams: React.FC = () => {
           <h1 className="text-3xl font-bold text-gray-800 mb-2">Teams</h1>
           <p className="text-gray-600">Connect with friends and stay accountable together</p>
         </div>
-        
+
         <button className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2">
-          <Plus className="w-5 h-5" />
+          <FaUsers />
           Create Team
         </button>
       </div>
@@ -94,7 +96,7 @@ const TeamCard: React.FC<{
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <h3 className="font-bold text-gray-800">{name}</h3>
-            {role === 'leader' && <Crown className="w-4 h-4 text-yellow-500" />}
+            {role === 'leader' && <FaCrown className="text-yellow-500" />}
           </div>
           <p className="text-sm text-gray-600">{members} members</p>
         </div>
@@ -113,18 +115,17 @@ const TeamCard: React.FC<{
 
       {role !== 'none' && (
         <div className="flex items-center gap-2 mb-4">
-          <Star className="w-4 h-4 text-yellow-500" />
+          {role === 'leader' ? <FaCrown className="text-yellow-500" /> : <FaUser className="text-purple-400" />}
           <span className="text-sm font-medium text-gray-700">
             {role === 'leader' ? 'Team Leader' : 'Member'}
           </span>
         </div>
       )}
 
-      <button className={`w-full py-2 rounded-lg font-medium transition-all duration-200 ${
-        canJoin
-          ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:shadow-lg'
-          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-      }`}>
+      <button className={`w-full py-2 rounded-lg font-medium transition-all duration-200 ${canJoin
+        ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:shadow-lg'
+        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+        }`}>
         {canJoin ? 'Join Team' : role === 'leader' ? 'Manage Team' : 'View Team'}
       </button>
     </div>

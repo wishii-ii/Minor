@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { FaMedal, FaStar } from 'react-icons/fa';
 import { useData } from '../contexts/DataContext';
-import { Trophy, Lock } from 'lucide-react';
+
 
 export const Achievements: React.FC = () => {
   const { achievements } = useData();
@@ -25,11 +26,10 @@ export const Achievements: React.FC = () => {
           <button
             key={filterType}
             onClick={() => setFilter(filterType as any)}
-            className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-              filter === filterType
-                ? 'bg-purple-100 text-purple-700'
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
+            className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${filter === filterType
+              ? 'bg-purple-100 text-purple-700'
+              : 'text-gray-600 hover:bg-gray-100'
+              }`}
           >
             {filterType.charAt(0).toUpperCase() + filterType.slice(1)}
           </button>
@@ -55,18 +55,16 @@ const AchievementCard: React.FC<{ achievement: any }> = ({ achievement }) => {
   };
 
   return (
-    <div className={`bg-white rounded-xl p-6 shadow-md border-2 transition-all duration-200 hover:shadow-lg ${
-      achievement.earned 
-        ? 'border-green-200 bg-gradient-to-br from-green-50 to-white' 
-        : 'border-gray-200'
-    }`}>
+    <div className={`bg-white rounded-xl p-6 shadow-md border-2 transition-all duration-200 hover:shadow-lg ${achievement.earned
+      ? 'border-green-200 bg-gradient-to-br from-green-50 to-white'
+      : 'border-gray-200'
+      }`}>
       <div className="flex items-center gap-4 mb-4">
-        <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl ${
-          achievement.earned 
-            ? `bg-gradient-to-br ${tierColors[achievement.tier]} text-white shadow-lg`
-            : 'bg-gray-200 text-gray-400'
-        }`}>
-          {achievement.earned ? achievement.icon : <Lock className="w-8 h-8" />}
+        <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl ${achievement.earned
+          ? `bg-gradient-to-br ${tierColors[achievement.tier as keyof typeof tierColors]} text-white shadow-lg`
+          : 'bg-gray-200 text-gray-400'
+          }`}>
+          {achievement.earned ? achievement.icon : <FaMedal size={32} />}
         </div>
         <div className="flex-1">
           <h3 className={`font-bold text-lg ${achievement.earned ? 'text-gray-800' : 'text-gray-500'}`}>
@@ -77,7 +75,7 @@ const AchievementCard: React.FC<{ achievement: any }> = ({ achievement }) => {
           </p>
         </div>
         {achievement.earned && (
-          <Trophy className="w-6 h-6 text-yellow-500" />
+          <FaStar size={20} className="text-yellow-400" />
         )}
       </div>
 

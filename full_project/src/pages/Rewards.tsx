@@ -1,11 +1,11 @@
+
 import React, { useState } from 'react';
-import { Gift, Star, Crown, Sparkles } from 'lucide-react';
-import { useUser } from '../contexts/UserContext';
+import { FaCoins, FaUser, FaGift, FaPalette } from 'react-icons/fa';
+
 
 export const Rewards: React.FC = () => {
-  const { user } = useUser();
   const [selectedCategory, setSelectedCategory] = useState<'avatars' | 'treats' | 'themes'>('avatars');
-  
+
   // Mock currency system - could be XP points or separate reward points
   const rewardPoints = 450;
 
@@ -42,10 +42,10 @@ export const Rewards: React.FC = () => {
           <h1 className="text-3xl font-bold text-gray-800 mb-2">Rewards Shop</h1>
           <p className="text-gray-600">Exchange your progress for amazing rewards</p>
         </div>
-        
+
         <div className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-6 py-3 rounded-xl">
           <div className="flex items-center gap-2">
-            <Star className="w-5 h-5" />
+            <FaCoins />
             <span className="font-semibold">{rewardPoints} Points</span>
           </div>
         </div>
@@ -54,18 +54,17 @@ export const Rewards: React.FC = () => {
       {/* Categories */}
       <div className="flex gap-4 mb-8">
         {[
-          { key: 'avatars', label: 'Avatars', icon: <Crown className="w-5 h-5" /> },
-          { key: 'treats', label: 'Real-Life Treats', icon: <Gift className="w-5 h-5" /> },
-          { key: 'themes', label: 'Themes', icon: <Sparkles className="w-5 h-5" /> }
+          { key: 'avatars', label: 'Avatars', icon: <FaUser /> },
+          { key: 'treats', label: 'Real-Life Treats', icon: <FaGift /> },
+          { key: 'themes', label: 'Themes', icon: <FaPalette /> }
         ].map((category) => (
           <button
             key={category.key}
             onClick={() => setSelectedCategory(category.key as any)}
-            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
-              selectedCategory === category.key
-                ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-lg'
-                : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
-            }`}
+            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${selectedCategory === category.key
+              ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-lg'
+              : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+              }`}
           >
             {category.icon}
             {category.label}
@@ -79,9 +78,8 @@ export const Rewards: React.FC = () => {
           <RewardCard
             key={reward.id}
             reward={reward}
-            userPoints={rewardPoints}
             canAfford={rewardPoints >= reward.price}
-            rarityStyle={rarityColors[reward.rarity]}
+            rarityStyle={rarityColors[reward.rarity as keyof typeof rarityColors]}
           />
         ))}
       </div>
@@ -108,10 +106,10 @@ export const Rewards: React.FC = () => {
 
 const RewardCard: React.FC<{
   reward: any;
-  userPoints: number;
+  // userPoints: number;
   canAfford: boolean;
   rarityStyle: string;
-}> = ({ reward, userPoints, canAfford, rarityStyle }) => {
+}> = ({ reward, canAfford, rarityStyle }) => {
   return (
     <div className={`rounded-xl p-4 border-2 shadow-md hover:shadow-lg transition-all duration-200 ${rarityStyle}`}>
       <div className="text-center mb-4">
@@ -124,28 +122,26 @@ const RewardCard: React.FC<{
 
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-1">
-          <Star className="w-4 h-4 text-yellow-500" />
+          <FaCoins className="text-yellow-500" />
           <span className="font-semibold text-gray-800">{reward.price}</span>
         </div>
-        <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-          reward.rarity === 'common' ? 'bg-gray-200 text-gray-700' :
+        <span className={`text-xs px-2 py-1 rounded-full font-medium ${reward.rarity === 'common' ? 'bg-gray-200 text-gray-700' :
           reward.rarity === 'rare' ? 'bg-blue-200 text-blue-700' :
-          reward.rarity === 'epic' ? 'bg-purple-200 text-purple-700' :
-          'bg-yellow-200 text-yellow-700'
-        }`}>
+            reward.rarity === 'epic' ? 'bg-purple-200 text-purple-700' :
+              'bg-yellow-200 text-yellow-700'
+          }`}>
           {reward.rarity}
         </span>
       </div>
 
       <button
         disabled={reward.owned || !canAfford}
-        className={`w-full py-2 rounded-lg font-medium transition-all duration-200 ${
-          reward.owned
-            ? 'bg-green-100 text-green-700 cursor-default'
-            : canAfford
+        className={`w-full py-2 rounded-lg font-medium transition-all duration-200 ${reward.owned
+          ? 'bg-green-100 text-green-700 cursor-default'
+          : canAfford
             ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:shadow-lg'
             : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-        }`}
+          }`}
       >
         {reward.owned ? 'Owned' : canAfford ? 'Purchase' : 'Insufficient Points'}
       </button>

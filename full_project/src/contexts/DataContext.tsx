@@ -1,3 +1,12 @@
+export interface Quest {
+  name: string;
+  description: string;
+  progress: number;
+  maxProgress: number;
+  participants: string[];
+  deadline: string;
+  status?: string;
+}
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { db } from "../firebase";
 import {
@@ -12,24 +21,34 @@ import {
 } from "firebase/firestore";
 import { useUser } from "./UserContext";
 
-interface Habit {
+export interface Habit {
   id: string;
   name: string;
   frequency: string;
   completions: number;
   lastCompletedAt?: string;
+  completedToday?: boolean;
+  title?: string;
+  streak?: number;
+  description?: string;
+  xpReward?: number;
+  isActive?: boolean;
+  createdAt?: string;
+  category?: string;
 }
 
-interface Achievements{
+interface Achievements {
   id: string;
   name: string;
   earned: boolean;
+  tier?: string;
+  icon?: string;
 }
 
 interface DataContextType {
   habits: Habit[];
   achievements: Achievements[];
-  addHabit: (habit: { name: string; frequency: string }) => Promise<void>;
+  addHabit: (habit: Partial<Habit>) => Promise<void>;
   removeHabit: (id: string) => Promise<void>;
   completeHabit: (id: string) => Promise<void>;
 }
@@ -62,28 +81,28 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Place this after the other useEffect
 
-useEffect(() => { // <-- ADD THIS ENTIRE BLOCK
-  if (user) {
-    // This code gets the achievements from your database...
-    const achievementsCollection = collection(db, "users", user.id, "achievements");
-    
-    // ...and then it writes them onto our whiteboard section.
-    const unsubscribe = onSnapshot(achievementsCollection, (snapshot) => {
-      setAchievements(
-        snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as Achievements[]
-      );
-    });
-    return () => unsubscribe();
-  }
-}, [user]);
+  useEffect(() => { // <-- ADD THIS ENTIRE BLOCK
+    if (user) {
+      // This code gets the achievements from your database...
+      const achievementsCollection = collection(db, "users", user.id, "achievements");
+
+      // ...and then it writes them onto our whiteboard section.
+      const unsubscribe = onSnapshot(achievementsCollection, (snapshot) => {
+        setAchievements(
+          snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as Achievements[]
+        );
+      });
+      return () => unsubscribe();
+    }
+  }, [user]);
 
   // ✅ Add habit
-  const addHabit = async (habit: { name: string; frequency: string }) => {
+  const addHabit = async (habit: Partial<Habit>) => {
     if (!user) return;
     await addDoc(collection(db, "users", user.id, "habits"), {
       ...habit,
-      completions: 0,
-      lastCompletedAt: null,
+      completions: habit.completions ?? 0,
+      lastCompletedAt: habit.lastCompletedAt ?? null,
     });
   };
 
@@ -106,7 +125,7 @@ useEffect(() => { // <-- ADD THIS ENTIRE BLOCK
 
 
   return (
-    <DataContext.Provider value={{ habits, achievements ,addHabit, removeHabit, completeHabit}}>
+    <DataContext.Provider value={{ habits, achievements, addHabit, removeHabit, completeHabit }}>
       {children}
     </DataContext.Provider>
   );

@@ -1,5 +1,14 @@
+
+
 import React, { useState } from 'react';
-import { Trophy, Medal, Award, TrendingUp } from 'lucide-react';
+import { FaMedal, FaFire, FaFlagCheckered, FaCrown, FaAward } from 'react-icons/fa';
+
+const categoryOptions = [
+  { key: 'xp', label: 'XP', icon: <FaMedal /> },
+  { key: 'streaks', label: 'Streaks', icon: <FaFire /> },
+  { key: 'quests', label: 'Quests', icon: <FaFlagCheckered /> },
+];
+
 
 export const Leaderboards: React.FC = () => {
   const [timeFilter, setTimeFilter] = useState<'weekly' | 'monthly' | 'allTime'>('weekly');
@@ -47,11 +56,10 @@ export const Leaderboards: React.FC = () => {
             <button
               key={filter}
               onClick={() => setTimeFilter(filter as any)}
-              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                timeFilter === filter
-                  ? 'bg-purple-100 text-purple-700'
-                  : 'text-gray-600 hover:bg-gray-100'
-              }`}
+              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${timeFilter === filter
+                ? 'bg-purple-100 text-purple-700'
+                : 'text-gray-600 hover:bg-gray-100'
+                }`}
             >
               {filter === 'allTime' ? 'All Time' : filter.charAt(0).toUpperCase() + filter.slice(1)}
             </button>
@@ -60,19 +68,14 @@ export const Leaderboards: React.FC = () => {
 
         <div className="flex gap-2">
           <span className="font-medium text-gray-700 self-center">Category:</span>
-          {[
-            { key: 'xp', label: 'XP', icon: <TrendingUp className="w-4 h-4" /> },
-            { key: 'streaks', label: 'Streaks', icon: <Award className="w-4 h-4" /> },
-            { key: 'quests', label: 'Quests', icon: <Trophy className="w-4 h-4" /> },
-          ].map((cat) => (
+          {categoryOptions.map((cat) => (
             <button
               key={cat.key}
               onClick={() => setCategory(cat.key as any)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                category === cat.key
-                  ? 'bg-purple-100 text-purple-700'
-                  : 'text-gray-600 hover:bg-gray-100'
-              }`}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${category === cat.key
+                ? 'bg-purple-100 text-purple-700'
+                : 'text-gray-600 hover:bg-gray-100'
+                }`}
             >
               {cat.icon}
               {cat.label}
@@ -94,14 +97,13 @@ export const Leaderboards: React.FC = () => {
               <div className="flex items-center gap-4">
                 <div className="flex items-center justify-center w-10 h-10">
                   {index < 3 ? (
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      index === 0 ? 'bg-yellow-500' :
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${index === 0 ? 'bg-yellow-500' :
                       index === 1 ? 'bg-gray-400' :
-                      'bg-orange-500'
-                    }`}>
-                      {index === 0 ? <Trophy className="w-5 h-5 text-white" /> :
-                       index === 1 ? <Medal className="w-5 h-5 text-white" /> :
-                       <Award className="w-5 h-5 text-white" />}
+                        'bg-orange-500'
+                      }`}>
+                      {index === 0 ? <FaCrown className="text-yellow-200" /> :
+                        index === 1 ? <FaMedal className="text-gray-200" /> :
+                          <FaAward className="text-orange-200" />}
                     </div>
                   ) : (
                     <span className="text-xl font-bold text-gray-500">#{user.rank}</span>
@@ -132,7 +134,7 @@ export const Leaderboards: React.FC = () => {
       {/* Achievement Notice */}
       <div className="mt-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-4 border border-purple-200">
         <p className="text-sm text-gray-600">
-          <strong>Fair Play Notice:</strong> Rankings are updated daily and monitored for authentic progress. 
+          <strong>Fair Play Notice:</strong> Rankings are updated daily and monitored for authentic progress.
           Keep building those habits consistently!
         </p>
       </div>

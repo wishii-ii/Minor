@@ -1,5 +1,7 @@
+
 import React, { useState } from 'react';
-import { Bell, Check, Clock, Award, Users, Sword } from 'lucide-react';
+import { FaMedal, FaFlag, FaBell, FaUsers, FaInbox } from 'react-icons/fa';
+
 
 export const Notifications: React.FC = () => {
   const [filter, setFilter] = useState<'all' | 'unread' | 'achievements' | 'quests'>('all');
@@ -12,7 +14,7 @@ export const Notifications: React.FC = () => {
       message: 'You earned the "Streak Starter" badge for maintaining a 7-day streak',
       time: '2 hours ago',
       read: false,
-      icon: <Award className="w-5 h-5" />,
+      icon: <FaMedal />,
       color: 'text-yellow-600 bg-yellow-100'
     },
     {
@@ -22,7 +24,7 @@ export const Notifications: React.FC = () => {
       message: 'Your team made great progress on the Tower of Wellness quest!',
       time: '4 hours ago',
       read: false,
-      icon: <Sword className="w-5 h-5" />,
+      icon: <FaFlag />,
       color: 'text-purple-600 bg-purple-100'
     },
     {
@@ -32,7 +34,7 @@ export const Notifications: React.FC = () => {
       message: 'Don\'t forget to complete your daily reading habit',
       time: '6 hours ago',
       read: true,
-      icon: <Clock className="w-5 h-5" />,
+      icon: <FaBell />,
       color: 'text-blue-600 bg-blue-100'
     },
     {
@@ -42,7 +44,7 @@ export const Notifications: React.FC = () => {
       message: 'Quest Master invited you to join the "Fitness Fanatics" team',
       time: '1 day ago',
       read: true,
-      icon: <Users className="w-5 h-5" />,
+      icon: <FaUsers />,
       color: 'text-green-600 bg-green-100'
     },
     {
@@ -52,7 +54,7 @@ export const Notifications: React.FC = () => {
       message: 'Congratulations! You reached Level 8',
       time: '2 days ago',
       read: true,
-      icon: <Award className="w-5 h-5" />,
+      icon: <FaMedal />,
       color: 'text-yellow-600 bg-yellow-100'
     }
   ];
@@ -73,7 +75,7 @@ export const Notifications: React.FC = () => {
           <h1 className="text-3xl font-bold text-gray-800 mb-2">Notifications</h1>
           <p className="text-gray-600">Stay updated on your progress and team activities</p>
         </div>
-        
+
         {unreadCount > 0 && (
           <button className="text-purple-600 font-medium hover:text-purple-700 transition-colors">
             Mark all as read
@@ -92,11 +94,10 @@ export const Notifications: React.FC = () => {
           <button
             key={filterOption.key}
             onClick={() => setFilter(filterOption.key as any)}
-            className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-              filter === filterOption.key
-                ? 'bg-purple-100 text-purple-700'
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
+            className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${filter === filterOption.key
+              ? 'bg-purple-100 text-purple-700'
+              : 'text-gray-600 hover:bg-gray-100'
+              }`}
           >
             {filterOption.label}
           </button>
@@ -108,17 +109,16 @@ export const Notifications: React.FC = () => {
         {filteredNotifications.map((notification) => (
           <div
             key={notification.id}
-            className={`bg-white rounded-lg p-4 shadow-sm border transition-all duration-200 hover:shadow-md ${
-              notification.read
-                ? 'border-gray-200'
-                : 'border-purple-200 bg-gradient-to-r from-purple-50 to-white'
-            }`}
+            className={`bg-white rounded-lg p-4 shadow-sm border transition-all duration-200 hover:shadow-md ${notification.read
+              ? 'border-gray-200'
+              : 'border-purple-200 bg-gradient-to-r from-purple-50 to-white'
+              }`}
           >
             <div className="flex items-start gap-4">
               <div className={`p-2 rounded-full ${notification.color}`}>
                 {notification.icon}
               </div>
-              
+
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between">
                   <h3 className={`font-semibold ${notification.read ? 'text-gray-800' : 'text-gray-900'}`}>
@@ -131,11 +131,11 @@ export const Notifications: React.FC = () => {
                     )}
                   </div>
                 </div>
-                
+
                 <p className={`text-sm mt-1 ${notification.read ? 'text-gray-600' : 'text-gray-700'}`}>
                   {notification.message}
                 </p>
-                
+
                 <div className="flex gap-2 mt-3">
                   {notification.type === 'social' && (
                     <>
@@ -147,19 +147,19 @@ export const Notifications: React.FC = () => {
                       </button>
                     </>
                   )}
-                  
+
                   {notification.type === 'achievement' && (
                     <button className="text-purple-600 text-sm font-medium hover:text-purple-700 transition-colors">
                       View Achievement
                     </button>
                   )}
-                  
+
                   {notification.type === 'quest' && (
                     <button className="text-purple-600 text-sm font-medium hover:text-purple-700 transition-colors">
                       Go to Quest
                     </button>
                   )}
-                  
+
                   {notification.type === 'reminder' && (
                     <button className="text-purple-600 text-sm font-medium hover:text-purple-700 transition-colors">
                       Complete Now
@@ -174,7 +174,7 @@ export const Notifications: React.FC = () => {
 
       {filteredNotifications.length === 0 && (
         <div className="text-center py-12">
-          <Bell className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <FaInbox className="mx-auto mb-4 text-4xl text-gray-300" />
           <h3 className="text-lg font-medium text-gray-600 mb-2">No notifications</h3>
           <p className="text-gray-500">You're all caught up! Keep building those habits.</p>
         </div>
