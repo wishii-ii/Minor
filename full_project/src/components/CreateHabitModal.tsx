@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { FaTimes } from 'react-icons/fa';
 import { useData } from '../contexts/DataContext';
-import { X } from 'lucide-react';
+
 
 interface CreateHabitModalProps {
   onClose: () => void;
@@ -20,6 +21,8 @@ export const CreateHabitModal: React.FC<CreateHabitModalProps> = ({ onClose }) =
     e.preventDefault();
     if (formData.title.trim()) {
       addHabit({
+        // keep backwards compatibility: Habit.name is used elsewhere, map title -> name
+        name: formData.title,
         ...formData,
         isActive: true,
         streak: 0,
@@ -39,8 +42,9 @@ export const CreateHabitModal: React.FC<CreateHabitModalProps> = ({ onClose }) =
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
+            aria-label="Close"
           >
-            <X className="w-6 h-6" />
+            <FaTimes size={20} />
           </button>
         </div>
 
@@ -78,7 +82,7 @@ export const CreateHabitModal: React.FC<CreateHabitModalProps> = ({ onClose }) =
             </label>
             <select
               value={formData.frequency}
-              onChange={(e) => setFormData(prev => ({ ...prev, frequency: e.target.value as any }))}
+              onChange={(e) => setFormData(prev => ({ ...prev, frequency: e.target.value as 'daily' | 'weekly' }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
               <option value="daily">Daily</option>

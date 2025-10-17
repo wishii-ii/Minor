@@ -1,6 +1,8 @@
+
 import React from 'react';
-import { Check, Flame, Calendar } from 'lucide-react';
-import { Habit } from '../contexts/DataContext';
+import { FaFire, FaCalendarAlt, FaCheck } from 'react-icons/fa';
+
+import { Habit } from '../types/models';
 
 interface HabitCardProps {
   habit: Habit;
@@ -16,19 +18,19 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, onComplete }) => {
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
             <h3 className="font-semibold text-gray-800">{habit.title}</h3>
-            {habit.streak > 0 && (
+            {(habit.streak ?? 0) > 0 && (
               <div className="flex items-center gap-1 bg-orange-100 text-orange-600 px-2 py-1 rounded-full text-xs font-medium">
-                <Flame className="w-3 h-3" />
-                {habit.streak}
+                <FaFire size={14} className="text-orange-500" />
+                {habit.streak ?? 0}
               </div>
             )}
           </div>
-          
+
           <p className="text-sm text-gray-600 mb-3">{habit.description}</p>
-          
+
           <div className="flex items-center gap-4 text-xs text-gray-500">
             <div className="flex items-center gap-1">
-              <Calendar className="w-3 h-3" />
+              <FaCalendarAlt size={12} className="text-purple-400" />
               {habit.frequency}
             </div>
             <span>+{habit.xpReward} XP</span>
@@ -38,13 +40,12 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, onComplete }) => {
         <button
           onClick={onComplete}
           disabled={habit.completedToday}
-          className={`ml-4 w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 ${
-            habit.completedToday
-              ? 'bg-green-500 text-white shadow-lg'
-              : 'bg-gray-100 text-gray-400 hover:bg-purple-500 hover:text-white hover:shadow-md'
-          }`}
+          className={`ml-4 w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 ${habit.completedToday
+            ? 'bg-green-500 text-white shadow-lg'
+            : 'bg-gray-100 text-gray-400 hover:bg-purple-500 hover:text-white hover:shadow-md'
+            }`}
         >
-          <Check className="w-6 h-6" />
+          <FaCheck size={20} />
         </button>
       </div>
 

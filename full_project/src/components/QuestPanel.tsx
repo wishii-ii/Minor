@@ -1,5 +1,7 @@
+
 import React from 'react';
-import { Users, Sword, Clock } from 'lucide-react';
+import { FaFlag, FaUsers, FaCalendarAlt } from 'react-icons/fa';
+
 import { Quest } from '../contexts/DataContext';
 
 interface QuestPanelProps {
@@ -12,12 +14,12 @@ export const QuestPanel: React.FC<QuestPanelProps> = ({ quest }) => {
   return (
     <div className="bg-white rounded-xl p-6 shadow-md border border-indigo-100">
       <div className="flex items-center gap-2 mb-3">
-        <Sword className="w-5 h-5 text-purple-600" />
+        <FaFlag className="text-indigo-500" />
         <h3 className="font-bold text-gray-800">{quest.name}</h3>
       </div>
-      
+
       <p className="text-sm text-gray-600 mb-4">{quest.description}</p>
-      
+
       {/* Progress */}
       <div className="mb-4">
         <div className="flex justify-between items-center mb-2">
@@ -35,11 +37,11 @@ export const QuestPanel: React.FC<QuestPanelProps> = ({ quest }) => {
       {/* Quest Info */}
       <div className="space-y-2 mb-4">
         <div className="flex items-center gap-2 text-sm text-gray-600">
-          <Users className="w-4 h-4" />
+          <FaUsers className="text-purple-400" />
           <span>{quest.participants.length} participants</span>
         </div>
         <div className="flex items-center gap-2 text-sm text-gray-600">
-          <Clock className="w-4 h-4" />
+          <FaCalendarAlt className="text-purple-400" />
           <span>Due {new Date(quest.deadline).toLocaleDateString()}</span>
         </div>
       </div>

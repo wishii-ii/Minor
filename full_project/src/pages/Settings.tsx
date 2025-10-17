@@ -1,9 +1,20 @@
+
 import React from 'react';
-import { User, Bell, Palette, Shield, Download, Moon } from 'lucide-react';
+import { FaUser, FaBell, FaPalette, FaLock, FaDatabase } from 'react-icons/fa';
+
 import { useUser } from '../contexts/UserContext';
+import { useState, useEffect } from 'react';
 
 export const Settings: React.FC = () => {
-  const { user, updateUser } = useUser();
+  const { user, updateUser, deleteAccount } = useUser();
+  const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
+  const [ownedAvatars, setOwnedAvatars] = useState<number[]>([]);
+  const DARK_MODE_ID = 8; // id used in Rewards for Dark Mode
+
+  useEffect(() => {
+    setSelectedAvatar(user?.avatar || null);
+    setOwnedAvatars(user?.purchasedRewardIds ?? []);
+  }, [user]);
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
@@ -16,7 +27,7 @@ export const Settings: React.FC = () => {
         {/* Profile Settings */}
         <SettingsSection
           title="Profile"
-          icon={<User className="w-5 h-5" />}
+          icon={<FaUser />}
         >
           <div className="grid md:grid-cols-2 gap-6">
             <div>
@@ -35,11 +46,46 @@ export const Settings: React.FC = () => {
                 Avatar
               </label>
               <div className="flex items-center gap-3">
-                <span className="text-2xl">{user?.avatar}</span>
-                <button className="text-purple-600 font-medium hover:text-purple-700 transition-colors">
-                  Change Avatar
-                </button>
+                <span className="text-2xl">{selectedAvatar || user?.avatar}</span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      // open small picker: for now toggle between a few built-in avatars
+                      const options = ['🧙‍♂️', '⚔️', '🐉', '🔥'];
+                      const next = options[(options.indexOf(selectedAvatar || user?.avatar || '🧙‍♂️') + 1) % options.length];
+                      setSelectedAvatar(next);
+                    }}
+                    className="text-purple-600 font-medium hover:text-purple-700 transition-colors"
+                  >
+                    Change Avatar
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (!selectedAvatar) return;
+                      updateUser({ avatar: selectedAvatar });
+                    }}
+                    className="text-sm px-3 py-1 bg-indigo-600 text-white rounded-md"
+                  >
+                    Save
+                  </button>
+                </div>
               </div>
+
+              {ownedAvatars.length > 0 && (
+                <div className="mt-3 text-sm text-gray-600">
+                  <div className="font-medium mb-1">Purchased Avatars</div>
+                  <div className="flex gap-2">
+                    {ownedAvatars.filter(id => id >= 1 && id <= 4).map(id => (
+                      <button key={id} onClick={() => {
+                        const map: Record<number, string> = { 1: '🧙‍♂️', 2: '⚔️', 3: '🐉', 4: '🔥' };
+                        const icon = map[id];
+                        setSelectedAvatar(icon);
+                        updateUser({ avatar: icon });
+                      }} className="px-3 py-2 bg-gray-100 rounded-lg">{id === 1 ? '🧙‍♂️' : id === 2 ? '⚔️' : id === 3 ? '🐉' : '🔥'}</button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </SettingsSection>
@@ -47,7 +93,7 @@ export const Settings: React.FC = () => {
         {/* Notifications */}
         <SettingsSection
           title="Notifications"
-          icon={<Bell className="w-5 h-5" />}
+          icon={<FaBell />}
         >
           <div className="space-y-4">
             <ToggleSetting
@@ -76,7 +122,7 @@ export const Settings: React.FC = () => {
         {/* Appearance */}
         <SettingsSection
           title="Appearance"
-          icon={<Palette className="w-5 h-5" />}
+          icon={<FaPalette />}
         >
           <div className="space-y-4">
             <div>
@@ -84,47 +130,94 @@ export const Settings: React.FC = () => {
                 Theme
               </label>
               <div className="grid grid-cols-3 gap-3">
-                <ThemeOption name="Light" active={true} />
-                <ThemeOption name="Dark" active={false} />
-                <ThemeOption name="Auto" active={false} />
+                <button
+                  onClick={() => updateUser({ theme: 'light' })}
+                  className={`p-3 rounded-lg border-2 font-medium transition-all duration-200 ${user?.theme === 'light' ? 'border-purple-500 bg-purple-50 text-purple-700' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
+                  Light
+                </button>
+                <button
+                  onClick={() => {
+                    // only allow dark if user purchased the dark mode reward
+                    if (!user?.purchasedRewardIds?.includes(DARK_MODE_ID)) return;
+                    updateUser({ theme: 'dark' });
+                  }}
+                  className={`p-3 rounded-lg border-2 font-medium transition-all duration-200 ${user?.theme === 'dark' ? 'border-purple-500 bg-purple-50 text-purple-700' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                  disabled={!user?.purchasedRewardIds?.includes(DARK_MODE_ID)}
+                >
+                  Dark {user?.purchasedRewardIds?.includes(DARK_MODE_ID) ? '' : '(Locked)'}
+                </button>
+                <button
+                  onClick={() => updateUser({ theme: 'auto' })}
+                  className={`p-3 rounded-lg border-2 font-medium transition-all duration-200 ${user?.theme === 'auto' ? 'border-purple-500 bg-purple-50 text-purple-700' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
+                  Auto
+                </button>
               </div>
             </div>
-            <ToggleSetting
-              label="Reduced Motion"
-              description="Minimize animations and transitions"
-              defaultChecked={false}
-            />
           </div>
         </SettingsSection>
 
         {/* Privacy */}
         <SettingsSection
           title="Privacy"
-          icon={<Shield className="w-5 h-5" />}
+          icon={<FaLock />}
         >
           <div className="space-y-4">
-            <ToggleSetting
-              label="Public Profile"
-              description="Allow others to view your profile and achievements"
-              defaultChecked={true}
-            />
-            <ToggleSetting
-              label="Show on Leaderboards"
-              description="Display your progress on public leaderboards"
-              defaultChecked={true}
-            />
-            <ToggleSetting
-              label="Activity Status"
-              description="Let team members see when you're online"
-              defaultChecked={false}
-            />
+            <div className="space-y-4">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h4 className="font-medium text-gray-800">Public Profile</h4>
+                  <p className="text-sm text-gray-600">Allow others to view your profile and achievements</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={!!user?.publicProfile}
+                    onChange={(e) => updateUser({ publicProfile: e.target.checked })}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                </label>
+              </div>
+
+              <div className="flex items-start justify-between">
+                <div>
+                  <h4 className="font-medium text-gray-800">Show on Leaderboards</h4>
+                  <p className="text-sm text-gray-600">Display your progress on public leaderboards</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={!!user?.showOnLeaderboards}
+                    onChange={(e) => updateUser({ showOnLeaderboards: e.target.checked })}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                </label>
+              </div>
+
+              <div className="flex items-start justify-between">
+                <div>
+                  <h4 className="font-medium text-gray-800">Activity Status</h4>
+                  <p className="text-sm text-gray-600">Let team members see when you're online</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={!!user?.activityStatus}
+                    onChange={(e) => updateUser({ activityStatus: e.target.checked })}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                </label>
+              </div>
+            </div>
           </div>
         </SettingsSection>
 
         {/* Data & Export */}
         <SettingsSection
           title="Data & Export"
-          icon={<Download className="w-5 h-5" />}
+          icon={<FaDatabase />}
         >
           <div className="space-y-4">
             <div>
@@ -132,8 +225,8 @@ export const Settings: React.FC = () => {
               <p className="text-sm text-gray-600 mb-4">
                 Download a copy of your habit data, progress, and achievements
               </p>
-              <button className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:shadow-lg transition-all duration-200">
-                Export Data
+              <button disabled className="bg-gray-200 text-gray-500 px-4 py-2 rounded-lg font-medium transition-all duration-200">
+                Export Data (Coming Soon)
               </button>
             </div>
             <div className="pt-4 border-t border-gray-200">
@@ -141,7 +234,10 @@ export const Settings: React.FC = () => {
               <p className="text-sm text-gray-600 mb-4">
                 Permanently delete your account and all associated data
               </p>
-              <button className="bg-red-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-600 transition-colors">
+              <button onClick={() => {
+                if (!confirm('Are you sure you want to delete your account? This action cannot be undone on the client.')) return;
+                deleteAccount();
+              }} className="bg-red-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-600 transition-colors">
                 Delete Account
               </button>
             </div>
@@ -191,19 +287,4 @@ const ToggleSetting: React.FC<{
   );
 };
 
-const ThemeOption: React.FC<{
-  name: string;
-  active: boolean;
-}> = ({ name, active }) => {
-  return (
-    <button
-      className={`p-3 rounded-lg border-2 font-medium transition-all duration-200 ${
-        active
-          ? 'border-purple-500 bg-purple-50 text-purple-700'
-          : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-      }`}
-    >
-      {name}
-    </button>
-  );
-};
+// ThemeOption component removed; theme selection is now handled inline above.

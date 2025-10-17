@@ -1,19 +1,43 @@
+
 import React from 'react';
-import { Users, Plus, Crown, Star } from 'lucide-react';
+import { FaCrown, FaUser, FaLock } from 'react-icons/fa';
+import { useUser } from '../contexts/UserContext';
+
 
 export const Teams: React.FC = () => {
+  useUser();
+
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-800 mb-2">Teams</h1>
           <p className="text-gray-600">Connect with friends and stay accountable together</p>
         </div>
-        
-        <button className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2">
-          <Plus className="w-5 h-5" />
-          Create Team
-        </button>
+
+        <div>
+          {/* Force-locked: Create disabled for all users */}
+          <button
+            disabled
+            aria-disabled="true"
+            title="Teams are locked until you reach level 5"
+            className="inline-flex items-center gap-2 bg-gray-100 text-gray-400 px-6 py-3 rounded-xl font-semibold shadow-sm transition-all duration-200 cursor-not-allowed"
+          >
+            <FaLock />
+            Create Team (Locked)
+          </button>
+        </div>
+      </div>
+
+      {/* Locked banner */}
+      <div className="mb-8 p-4 rounded-lg bg-yellow-50 border border-yellow-100 text-yellow-800">
+        <div className="flex items-center gap-3">
+          <FaLock className="text-yellow-600" />
+          <div>
+            <strong>Teams are locked</strong>
+            <div className="text-sm">Reach level 5 to unlock full Teams functionality (create, join, and manage teams).</div>
+          </div>
+        </div>
       </div>
 
       {/* My Teams */}
@@ -27,6 +51,7 @@ export const Teams: React.FC = () => {
             activeQuests={2}
             teamXP={2450}
             avatar="⚡"
+            locked
           />
           <TeamCard
             name="Study Squad"
@@ -35,6 +60,7 @@ export const Teams: React.FC = () => {
             activeQuests={1}
             teamXP={1200}
             avatar="📚"
+            locked
           />
         </div>
       </div>
@@ -51,6 +77,7 @@ export const Teams: React.FC = () => {
             teamXP={5200}
             avatar="💪"
             canJoin
+            locked
           />
           <TeamCard
             name="Mindful Minds"
@@ -60,6 +87,7 @@ export const Teams: React.FC = () => {
             teamXP={980}
             avatar="🧘"
             canJoin
+            locked
           />
           <TeamCard
             name="Creative Crew"
@@ -69,6 +97,7 @@ export const Teams: React.FC = () => {
             teamXP={3100}
             avatar="🎨"
             canJoin
+            locked
           />
         </div>
       </div>
@@ -84,7 +113,8 @@ const TeamCard: React.FC<{
   teamXP: number;
   avatar: string;
   canJoin?: boolean;
-}> = ({ name, members, role, activeQuests, teamXP, avatar, canJoin }) => {
+  locked?: boolean;
+}> = ({ name, members, role, activeQuests, teamXP, avatar, canJoin, locked = false }) => {
   return (
     <div className="bg-white rounded-xl p-6 shadow-md border border-indigo-100 hover:shadow-lg transition-all duration-200">
       <div className="flex items-center gap-3 mb-4">
@@ -94,7 +124,7 @@ const TeamCard: React.FC<{
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <h3 className="font-bold text-gray-800">{name}</h3>
-            {role === 'leader' && <Crown className="w-4 h-4 text-yellow-500" />}
+            {role === 'leader' && <FaCrown className="text-yellow-500" />}
           </div>
           <p className="text-sm text-gray-600">{members} members</p>
         </div>
@@ -113,19 +143,21 @@ const TeamCard: React.FC<{
 
       {role !== 'none' && (
         <div className="flex items-center gap-2 mb-4">
-          <Star className="w-4 h-4 text-yellow-500" />
+          {role === 'leader' ? <FaCrown className="text-yellow-500" /> : <FaUser className="text-purple-400" />}
           <span className="text-sm font-medium text-gray-700">
             {role === 'leader' ? 'Team Leader' : 'Member'}
           </span>
         </div>
       )}
 
-      <button className={`w-full py-2 rounded-lg font-medium transition-all duration-200 ${
-        canJoin
-          ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:shadow-lg'
-          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-      }`}>
-        {canJoin ? 'Join Team' : role === 'leader' ? 'Manage Team' : 'View Team'}
+      <button
+        disabled={locked || !canJoin}
+        className={`w-full py-2 rounded-lg font-medium transition-all duration-200 ${locked || !canJoin
+          ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-100'
+          : 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:shadow-lg'
+          }`}
+      >
+        {locked ? 'Locked (Reach level 5)' : canJoin ? 'Join Team' : role === 'leader' ? 'Manage Team' : 'View Team'}
       </button>
     </div>
   );

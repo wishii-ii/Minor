@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { FaMedal, FaStar } from 'react-icons/fa';
 import { useData } from '../contexts/DataContext';
-import { Trophy, Lock } from 'lucide-react';
+
 
 export const Achievements: React.FC = () => {
   const { achievements } = useData();
@@ -21,15 +22,14 @@ export const Achievements: React.FC = () => {
 
       {/* Filter Tabs */}
       <div className="flex gap-4 mb-6">
-        {['all', 'earned', 'locked'].map((filterType) => (
+        {(['all', 'earned', 'locked'] as const).map((filterType) => (
           <button
             key={filterType}
-            onClick={() => setFilter(filterType as any)}
-            className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-              filter === filterType
-                ? 'bg-purple-100 text-purple-700'
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
+            onClick={() => setFilter(filterType)}
+            className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${filter === filterType
+              ? 'bg-purple-100 text-purple-700'
+              : 'text-gray-600 hover:bg-gray-100'
+              }`}
           >
             {filterType.charAt(0).toUpperCase() + filterType.slice(1)}
           </button>
@@ -46,7 +46,19 @@ export const Achievements: React.FC = () => {
   );
 };
 
-const AchievementCard: React.FC<{ achievement: any }> = ({ achievement }) => {
+interface Achievement {
+  id: string;
+  name: string;
+  description?: string;
+  earned?: boolean;
+  tier?: string;
+  icon?: string;
+  progress?: number;
+  requirement?: number;
+  earnedAt?: string;
+}
+
+const AchievementCard: React.FC<{ achievement: Achievement }> = ({ achievement }) => {
   const tierColors = {
     bronze: 'from-orange-400 to-orange-600',
     silver: 'from-gray-400 to-gray-600',
@@ -55,18 +67,16 @@ const AchievementCard: React.FC<{ achievement: any }> = ({ achievement }) => {
   };
 
   return (
-    <div className={`bg-white rounded-xl p-6 shadow-md border-2 transition-all duration-200 hover:shadow-lg ${
-      achievement.earned 
-        ? 'border-green-200 bg-gradient-to-br from-green-50 to-white' 
-        : 'border-gray-200'
-    }`}>
+    <div className={`bg-white rounded-xl p-6 shadow-md border-2 transition-all duration-200 hover:shadow-lg ${achievement.earned
+      ? 'border-green-200 bg-gradient-to-br from-green-50 to-white'
+      : 'border-gray-200'
+      }`}>
       <div className="flex items-center gap-4 mb-4">
-        <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl ${
-          achievement.earned 
-            ? `bg-gradient-to-br ${tierColors[achievement.tier]} text-white shadow-lg`
-            : 'bg-gray-200 text-gray-400'
-        }`}>
-          {achievement.earned ? achievement.icon : <Lock className="w-8 h-8" />}
+        <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl ${achievement.earned
+          ? `bg-gradient-to-br ${tierColors[achievement.tier as keyof typeof tierColors]} text-white shadow-lg`
+          : 'bg-gray-200 text-gray-400'
+          }`}>
+          {achievement.earned ? achievement.icon : <FaMedal size={32} />}
         </div>
         <div className="flex-1">
           <h3 className={`font-bold text-lg ${achievement.earned ? 'text-gray-800' : 'text-gray-500'}`}>
@@ -77,7 +87,7 @@ const AchievementCard: React.FC<{ achievement: any }> = ({ achievement }) => {
           </p>
         </div>
         {achievement.earned && (
-          <Trophy className="w-6 h-6 text-yellow-500" />
+          <FaStar size={20} className="text-yellow-400" />
         )}
       </div>
 
@@ -90,7 +100,7 @@ const AchievementCard: React.FC<{ achievement: any }> = ({ achievement }) => {
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div
               className="bg-gradient-to-r from-purple-500 to-indigo-600 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${(achievement.progress / achievement.requirement) * 100}%` }}
+              style={{ width: `${((achievement.progress ?? 0) / (achievement.requirement ?? 1)) * 100}%` }}
             />
           </div>
         </div>

@@ -1,5 +1,7 @@
+
 import React, { useState } from 'react';
-import { UserPlus, Search, MessageSquare, Users } from 'lucide-react';
+import { FaUserPlus, FaSearch, FaUsers, FaCommentDots, FaUserTimes } from 'react-icons/fa';
+
 
 export const Friends: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -37,16 +39,16 @@ export const Friends: React.FC = () => {
           <h1 className="text-3xl font-bold text-gray-800 mb-2">Friends</h1>
           <p className="text-gray-600">Connect with fellow adventurers on your growth journey</p>
         </div>
-        
+
         <button className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2">
-          <UserPlus className="w-5 h-5" />
+          <FaUserPlus />
           Add Friend
         </button>
       </div>
 
       {/* Search */}
       <div className="relative mb-8">
-        <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+        <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
         <input
           type="text"
           value={searchTerm}
@@ -127,8 +129,18 @@ export const Friends: React.FC = () => {
   );
 };
 
+interface Friend {
+  id: number;
+  name: string;
+  avatar: string;
+  status: 'online' | 'away' | 'offline' | string;
+  level: number;
+  currentStreak?: number;
+  mutualTeams?: number;
+}
+
 const FriendCard: React.FC<{
-  friend: any;
+  friend: Friend;
   statusColor: string;
 }> = ({ friend, statusColor }) => {
   return (
@@ -139,7 +151,7 @@ const FriendCard: React.FC<{
             <span className="text-3xl">{friend.avatar}</span>
             <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${statusColor}`} />
           </div>
-          
+
           <div>
             <h3 className="font-bold text-gray-800">{friend.name}</h3>
             <div className="flex items-center gap-4 text-sm text-gray-600">
@@ -147,7 +159,7 @@ const FriendCard: React.FC<{
               <span>{friend.currentStreak} day streak</span>
               {friend.mutualTeams > 0 && (
                 <span className="flex items-center gap-1">
-                  <Users className="w-3 h-3" />
+                  <FaUsers className="text-purple-400" />
                   {friend.mutualTeams} mutual
                 </span>
               )}
@@ -156,11 +168,11 @@ const FriendCard: React.FC<{
         </div>
 
         <div className="flex gap-2">
-          <button className="p-2 text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors">
-            <MessageSquare className="w-5 h-5" />
+          <button className="p-2 text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors" title="Message">
+            <FaCommentDots />
           </button>
-          <button className="p-2 text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors">
-            <Users className="w-5 h-5" />
+          <button className="p-2 text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors" title="Remove">
+            <FaUserTimes />
           </button>
         </div>
       </div>

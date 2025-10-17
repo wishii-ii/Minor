@@ -1,8 +1,10 @@
+
 import React from 'react';
-import { Sparkles, Target, Trophy, Users, Sword } from 'lucide-react';
+import { FaPlusCircle, FaFire, FaTrophy, FaUsers, FaFlagCheckered } from 'react-icons/fa';
+
 
 interface HomeProps {
-  onAuth: () => void;
+  onAuth: (mode: 'signup' | 'login') => void;
 }
 
 export const Home: React.FC<HomeProps> = ({ onAuth }) => {
@@ -17,22 +19,28 @@ export const Home: React.FC<HomeProps> = ({ onAuth }) => {
                 <span className="text-white font-bold text-3xl">H</span>
               </div>
             </div>
-            
+
             <h1 className="text-6xl font-bold mb-6 bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 bg-clip-text text-transparent">
               HABITŌRA
             </h1>
-            
+
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Build better days with HABITŌRA — create habits, earn XP, unlock badges, 
+              Build better days with HABITŌRA — create habits, earn XP, unlock badges,
               and team up for quests that make growth exciting
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
-                onClick={onAuth}
+                onClick={() => onAuth('signup')}
                 className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
               >
-                Start Your Adventure
+                Sign Up
+              </button>
+              <button
+                onClick={() => onAuth('login')}
+                className="bg-white border-2 border-purple-300 text-purple-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-purple-50 transition-all duration-200"
+              >
+                Log In
               </button>
               <button className="border-2 border-purple-300 text-purple-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-purple-50 transition-all duration-200">
                 Explore Features
@@ -47,30 +55,30 @@ export const Home: React.FC<HomeProps> = ({ onAuth }) => {
         <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">
           Turn Daily Goals Into Epic Adventures
         </h2>
-        
+
         <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-6">
           <FeatureCard
-            icon={<Target className="w-8 h-8" />}
+            icon={<FaPlusCircle size={32} />}
             title="Create Habits"
             description="Build daily routines that stick with smart reminders and tracking"
           />
           <FeatureCard
-            icon={<Sparkles className="w-8 h-8" />}
+            icon={<FaFire size={32} />}
             title="Track Streaks"
             description="Watch your consistency grow with beautiful streak counters"
           />
           <FeatureCard
-            icon={<Trophy className="w-8 h-8" />}
+            icon={<FaTrophy size={32} />}
             title="Earn Rewards"
             description="Unlock badges, level up, and collect achievements for your progress"
           />
           <FeatureCard
-            icon={<Users className="w-8 h-8" />}
+            icon={<FaUsers size={32} />}
             title="Join Teams"
             description="Connect with friends and stay accountable together"
           />
           <FeatureCard
-            icon={<Sword className="w-8 h-8" />}
+            icon={<FaFlagCheckered size={32} />}
             title="Complete Quests"
             description="Embark on epic challenges with your party members"
           />
