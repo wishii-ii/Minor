@@ -29,7 +29,7 @@ export default function Habits() {
             onClick={() => {
               // quick-add fallback for power users
               const name = prompt("Quick add habit (name):");
-              if (name) addHabit({ name, frequency: "daily" } as any);
+              if (name) addHabit({ name, frequency: "daily" });
             }}
             className="px-3 py-2 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50"
           >

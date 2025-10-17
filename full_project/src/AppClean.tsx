@@ -23,7 +23,7 @@ import { TestLab } from './pages/TestLab';
 import { Home } from './pages/Home';
 import Auth from './pages/Auth';
 
-function MainApp(): JSX.Element {
+function MainApp(): React.ReactElement {
   const { user } = useUser();
   const [currentPage, setCurrentPage] = useState<string>('home');
   const [isMobile, setIsMobile] = useState<boolean>(false);
@@ -136,7 +136,7 @@ function MainApp(): JSX.Element {
   );
 }
 
-export default function AppClean(): JSX.Element {
+export default function AppClean(): React.ReactElement {
   const [runtimeError, setRuntimeError] = useState<string | null>(null);
 
   // Global handlers to capture uncaught errors and promise rejections and show them in the UI

@@ -1,0 +1,51 @@
+declare module 'react-icons/fa' {
+    import type { ComponentType, SVGProps } from 'react';
+    type IconType = ComponentType<SVGProps<SVGSVGElement> & { title?: string }>;
+
+    export const FaTimes: IconType;
+    export const FaFire: IconType;
+    export const FaCalendarAlt: IconType;
+    export const FaCheck: IconType;
+    export const FaFlag: IconType;
+    export const FaUsers: IconType;
+    export const FaClock: IconType;
+    export const FaLock: IconType;
+    export const FaCrown: IconType;
+    export const FaUser: IconType;
+    export const FaMedal: IconType;
+    export const FaFlagCheckered: IconType;
+    export const FaAward: IconType;
+    export const FaPaperclip: IconType;
+    export const FaPaperPlane: IconType;
+    export const FaCoins: IconType;
+    export const FaGift: IconType;
+    export const FaPalette: IconType;
+    export const FaBell: IconType;
+    export const FaDatabase: IconType;
+    export const FaFlask: IconType;
+    export const FaExclamationTriangle: IconType;
+    export const FaCheckCircle: IconType;
+    export const FaChartLine: IconType;
+    export const FaChartBar: IconType;
+    export const FaTrophy: IconType;
+    export const FaInbox: IconType;
+    export const FaPlusCircle: IconType;
+    export const FaUserPlus: IconType;
+    export const FaSearch: IconType;
+    export const FaCommentDots: IconType;
+    export const FaUserTimes: IconType;
+    export const FaCalendarCheck: IconType;
+    export const FaDownload: IconType;
+    export const FaList: IconType;
+    export const FaShieldAlt: IconType;
+    export const FaFilter: IconType;
+    export const FaInfoCircle: IconType;
+    export const FaStar: IconType;
+    export const FaHome: IconType;
+    export const FaBullseye: IconType;
+    export const FaEnvelope: IconType;
+    export const FaCog: IconType;
+
+    const _default: { [key: string]: IconType };
+    export default _default;
+}

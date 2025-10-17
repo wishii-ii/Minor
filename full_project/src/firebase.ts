@@ -25,19 +25,18 @@ let googleProvider: GoogleAuthProvider | null = null;
 
 if (isConfigValid(firebaseConfig)) {
   try {
-    app = initializeApp(firebaseConfig as any);
+    // initializeApp expects a typed config; use unknown cast to avoid `any`
+    app = initializeApp(firebaseConfig as unknown as Record<string, string>);
     dbInstance = getFirestore(app);
     authInstance = getAuth(app);
     googleProvider = new GoogleAuthProvider();
     firebaseEnabled = true;
   } catch (err) {
     // initialization failed (invalid key or other); mark disabled and log for developer
-    // eslint-disable-next-line no-console
     console.error('Firebase initialization failed:', err);
     firebaseEnabled = false;
   }
 } else {
-  // eslint-disable-next-line no-console
   console.warn('Firebase config missing or incomplete. Firebase features are disabled.');
 }
 

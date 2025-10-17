@@ -53,11 +53,11 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     // If Firebase is configured and user present, load from Firestore. Otherwise, fall back to localStorage.
     if (firebaseEnabled && user) {
-      const q = query(collection(db as any, "users", user.id, "habits"));
+      const q = query(collection(db!, "users", user.id, "habits"));
       const unsubscribe = onSnapshot(q, (snapshot) => {
         const habitData: Habit[] = snapshot.docs.map((doc) => ({
           id: doc.id,
-          ...(doc.data() as any),
+          ...(doc.data() as Partial<Habit>),
         })) as Habit[];
         setHabits(habitData);
       });
@@ -75,7 +75,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     if (firebaseEnabled && user) {
-      const achievementsCollection = collection(db as any, "users", user.id, "achievements");
+      const achievementsCollection = collection(db!, "users", user.id, "achievements");
       const unsubscribe = onSnapshot(achievementsCollection, (snapshot) => {
         setAchievements(
           snapshot.docs.map((doc) => ({ id: doc.id, ...(doc.data() as Partial<Achievement>) })) as Achievement[]
@@ -94,7 +94,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // local fallback
       const newHabit: Habit = {
         id: String(Date.now()) + Math.random().toString(36).slice(2, 7),
-        name: (habit as any).name || (habit.title ?? 'Untitled Habit'),
+        name: (habit as Partial<Habit>).name || (habit.title ?? 'Untitled Habit'),
         title: habit.title,
         frequency: habit.frequency ?? 'daily',
         completions: habit.completions ?? 0,
@@ -115,7 +115,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
-    await addDoc(collection(db as any, "users", user.id, "habits"), {
+    await addDoc(collection(db!, "users", user.id, "habits"), {
       ...habit,
       completions: habit.completions ?? 0,
       lastCompletedAt: habit.lastCompletedAt ?? null,
@@ -133,7 +133,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
-    await deleteDoc(doc(db as any, "users", user.id, "habits", id));
+    await deleteDoc(doc(db!, "users", user.id, "habits", id));
   };
 
   // ✅ Complete habit (increment count)
@@ -162,7 +162,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     // Firestore path: increment completions and award xp based on local cached habit if available
-    const habitRef = doc(db as any, "users", user.id, "habits", id);
+    const habitRef = doc(db!, "users", user.id, "habits", id);
     await updateDoc(habitRef, {
       completions: increment(1),
       lastCompletedAt: new Date().toISOString(),

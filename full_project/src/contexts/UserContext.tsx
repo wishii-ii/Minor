@@ -1,9 +1,8 @@
 /* eslint-disable react-refresh/only-export-components */
 /* The firebase client SDK types are dynamic in this project and we use a few
-  explicit `any` casts when interacting with auth/db objects. Disable the
-  rule for this file to avoid noisy lint errors while keeping focused typing
-  elsewhere. */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+  explicit casts when interacting with auth/db objects. We keep most usage
+  typed but allow a small number of casts where the SDK types are not stable.
+*/
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { auth, signInWithGoogle, signOutCurrentUser, db, firebaseEnabled } from '../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -29,9 +28,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       // Load or create Firestore user profile
-      // firebase client types are dynamic here; allow an explicit any for interop
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const userRef = doc(db as any, 'users', fbUser.uid);
+      const userRef = doc(db!, 'users', fbUser.uid);
       const snap = await getDoc(userRef);
       if (!snap.exists()) {
         const newUser: User = {
@@ -47,7 +44,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           status: 'online',
           coins: 500, // give new users a welcome balance
         };
-        await setDoc(userRef, newUser as any);
+        await setDoc(userRef, newUser as unknown as Partial<Record<string, unknown>>);
         setUser(newUser);
       } else {
         setUser(snap.data() as User);
@@ -64,8 +61,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(prev => prev ? { ...prev, ...updates } as User : prev);
       return;
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const userRef = doc(db as any, 'users', user.id);
+    const userRef = doc(db!, 'users', user.id);
     await updateDoc(userRef, updates as unknown as Partial<Record<string, unknown>>);
     setUser(prev => prev ? { ...prev, ...updates } as User : prev);
   };
@@ -82,12 +78,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await updateDoc(doc(db as any, 'users', user.id), { coins: newAmount } as unknown as Partial<Record<string, unknown>>);
+      await updateDoc(doc(db!, 'users', user.id), { coins: newAmount } as unknown as Partial<Record<string, unknown>>);
       setUser(prev => prev ? { ...prev, coins: newAmount } as User : prev);
       return true;
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.warn('Failed to spend coins:', err);
       return false;
     }
@@ -104,11 +98,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await updateDoc(doc(db as any, 'users', user.id), { coins: newAmount } as unknown as Partial<Record<string, unknown>>);
+      await updateDoc(doc(db!, 'users', user.id), { coins: newAmount } as unknown as Partial<Record<string, unknown>>);
       setUser(prev => prev ? { ...prev, coins: newAmount } as User : prev);
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.warn('Failed to add coins:', err);
     }
   };
@@ -125,10 +117,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
-      await updateDoc(doc(db as any, 'users', user.id), { purchasedRewardIds: next } as unknown as Partial<Record<string, unknown>>);
+      await updateDoc(doc(db!, 'users', user.id), { purchasedRewardIds: next } as unknown as Partial<Record<string, unknown>>);
       setUser(prev => prev ? { ...prev, purchasedRewardIds: next } as User : prev);
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.warn('Failed to persist purchase:', err);
     }
   };
@@ -139,11 +130,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return;
     try {
       if (firebaseEnabled && db) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await updateDoc(doc(db as any, 'users', user.id), { deletedAt: new Date().toISOString(), deleted: true } as unknown as Partial<Record<string, unknown>>);
+        await updateDoc(doc(db!, 'users', user.id), { deletedAt: new Date().toISOString(), deleted: true } as unknown as Partial<Record<string, unknown>>);
       }
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.warn('Failed to mark account deleted:', err);
     }
 
@@ -169,8 +158,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await updateDoc(doc(db as any, 'users', user.id), {
+    await updateDoc(doc(db!, 'users', user.id), {
       xp: newXP,
       level: newLevel,
       xpToNext: newXPToNext,
@@ -194,23 +182,21 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // onAuthStateChanged handler above to create the user doc; to pass the
     // avatar through we write it immediately after sign-in if the doc is new.
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const prevUser = auth ? (auth as any).currentUser : null;
+      const prevUser = auth ? (auth as unknown as { currentUser?: unknown }).currentUser : null;
       await signInWithGoogle();
 
       // After sign-in, check if there is a user and whether their document exists.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const fbUser = (auth as any)?.currentUser || prevUser;
+      const fbUser = (auth as unknown as { currentUser?: unknown }).currentUser || prevUser;
       if (!fbUser || !firebaseEnabled || !db) return;
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const userRef = doc(db as any, 'users', fbUser.uid);
+      const fb = fbUser as { uid: string; email?: string; displayName?: string };
+      const userRef = doc(db!, 'users', fb.uid);
       const snap = await getDoc(userRef);
       if (!snap.exists()) {
         const newUser: User = {
-          id: fbUser.uid,
-          email: fbUser.email || '',
-          displayName: fbUser.displayName || 'New Adventurer',
+          id: fb.uid,
+          email: fb.email || '',
+          displayName: fb.displayName || 'New Adventurer',
           avatar: avatar || '🧙‍♂️',
           level: 1,
           xp: 0,
@@ -219,12 +205,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           joinDate: new Date().toISOString(),
           status: 'online',
         };
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await setDoc(userRef, newUser as any);
+        await setDoc(userRef, newUser as unknown as Partial<Record<string, unknown>>);
         setUser(newUser);
       }
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.warn('Sign-in-with-avatar failed or is disabled:', err);
     }
   };
