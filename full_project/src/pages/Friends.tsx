@@ -129,8 +129,18 @@ export const Friends: React.FC = () => {
   );
 };
 
+interface Friend {
+  id: number;
+  name: string;
+  avatar: string;
+  status: 'online' | 'away' | 'offline' | string;
+  level: number;
+  currentStreak?: number;
+  mutualTeams?: number;
+}
+
 const FriendCard: React.FC<{
-  friend: any;
+  friend: Friend;
   statusColor: string;
 }> = ({ friend, statusColor }) => {
   return (

@@ -23,7 +23,9 @@ export const Leaderboards: React.FC = () => {
     { rank: 6, name: 'Fitness Fighter', avatar: '💪', xp: 2340, streaks: 15, quests: 2 },
   ];
 
-  const getValue = (user: any) => {
+  type LeaderboardUser = { rank: number; name: string; avatar: string; xp: number; streaks: number; quests: number };
+
+  const getValue = (user: LeaderboardUser) => {
     switch (category) {
       case 'xp': return user.xp;
       case 'streaks': return user.streaks;
@@ -55,7 +57,7 @@ export const Leaderboards: React.FC = () => {
           {['weekly', 'monthly', 'allTime'].map((filter) => (
             <button
               key={filter}
-              onClick={() => setTimeFilter(filter as any)}
+              onClick={() => setTimeFilter(filter as 'weekly' | 'monthly' | 'allTime')}
               className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${timeFilter === filter
                 ? 'bg-purple-100 text-purple-700'
                 : 'text-gray-600 hover:bg-gray-100'
@@ -71,7 +73,7 @@ export const Leaderboards: React.FC = () => {
           {categoryOptions.map((cat) => (
             <button
               key={cat.key}
-              onClick={() => setCategory(cat.key as any)}
+              onClick={() => setCategory(cat.key as 'xp' | 'streaks' | 'quests')}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${category === cat.key
                 ? 'bg-purple-100 text-purple-700'
                 : 'text-gray-600 hover:bg-gray-100'

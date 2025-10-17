@@ -4,7 +4,7 @@ import { FaPlusCircle, FaFire, FaTrophy, FaUsers, FaFlagCheckered } from 'react-
 
 
 interface HomeProps {
-  onAuth: () => void;
+  onAuth: (mode: 'signup' | 'login') => void;
 }
 
 export const Home: React.FC<HomeProps> = ({ onAuth }) => {
@@ -31,10 +31,16 @@ export const Home: React.FC<HomeProps> = ({ onAuth }) => {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
-                onClick={onAuth}
+                onClick={() => onAuth('signup')}
                 className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
               >
-                Start Your Adventure
+                Sign Up
+              </button>
+              <button
+                onClick={() => onAuth('login')}
+                className="bg-white border-2 border-purple-300 text-purple-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-purple-50 transition-all duration-200"
+              >
+                Log In
               </button>
               <button className="border-2 border-purple-300 text-purple-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-purple-50 transition-all duration-200">
                 Explore Features

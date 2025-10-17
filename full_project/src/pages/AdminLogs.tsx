@@ -7,7 +7,10 @@ export const AdminLogs: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'activity' | 'audit'>('activity');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const activityLogs = [
+  type ActivityLog = { id: number; user: string; action: string; details: string; timestamp: string; type: string };
+  type AuditLog = { id: number; action: string; entity: string; entityId: string; details: string; user: string; timestamp: string };
+
+  const activityLogs: ActivityLog[] = [
     { id: 1, user: 'Habit Hero', action: 'Completed habit', details: 'Morning Meditation', timestamp: '2024-01-15 10:30:00', type: 'habit' },
     { id: 2, user: 'Quest Master', action: 'Joined team', details: 'Wellness Warriors', timestamp: '2024-01-15 10:25:00', type: 'social' },
     { id: 3, user: 'Mindful Monk', action: 'Level up', details: 'Reached Level 5', timestamp: '2024-01-15 10:20:00', type: 'progression' },
@@ -15,7 +18,7 @@ export const AdminLogs: React.FC = () => {
     { id: 5, user: 'Fitness Fighter', action: 'Created habit', details: 'Daily Workout', timestamp: '2024-01-15 10:10:00', type: 'habit' },
   ];
 
-  const auditLogs = [
+  const auditLogs: AuditLog[] = [
     { id: 1, action: 'USER_ROLE_CHANGED', entity: 'User', entityId: 'user-123', details: 'Role changed from member to admin', user: 'system', timestamp: '2024-01-15 09:45:00' },
     { id: 2, action: 'HABIT_DELETED', entity: 'Habit', entityId: 'habit-456', details: 'Habit "Bad Example" permanently deleted', user: 'admin-1', timestamp: '2024-01-15 09:30:00' },
     { id: 3, action: 'TEAM_SETTINGS_MODIFIED', entity: 'Team', entityId: 'team-789', details: 'Privacy settings updated', user: 'team-leader-2', timestamp: '2024-01-15 09:15:00' },
@@ -111,43 +114,43 @@ export const AdminLogs: React.FC = () => {
                   {activeTab === 'activity' ? (
                     <>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {(log as any).user}
+                        { (log as ActivityLog).user }
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        {(log as any).action}
+                        { (log as ActivityLog).action }
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        {(log as any).details}
+                        { (log as ActivityLog).details }
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${(log as any).type === 'habit' ? 'bg-blue-100 text-blue-800' :
-                          (log as any).type === 'social' ? 'bg-green-100 text-green-800' :
-                            (log as any).type === 'progression' ? 'bg-purple-100 text-purple-800' :
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${( (log as ActivityLog).type === 'habit' ) ? 'bg-blue-100 text-blue-800' :
+                          ( (log as ActivityLog).type === 'social' ) ? 'bg-green-100 text-green-800' :
+                            ( (log as ActivityLog).type === 'progression' ) ? 'bg-purple-100 text-purple-800' :
                               'bg-yellow-100 text-yellow-800'
                           }`}>
-                          {(log as any).type}
+                          { (log as ActivityLog).type }
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {(log as any).timestamp}
+                        { (log as ActivityLog).timestamp }
                       </td>
                     </>
                   ) : (
                     <>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {(log as any).action}
+                        {(log as AuditLog).action}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        {(log as any).entity}
+                        {(log as AuditLog).entity}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate">
-                        {(log as any).details}
+                        {(log as AuditLog).details}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        {(log as any).user}
+                        {(log as AuditLog).user}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {(log as any).timestamp}
+                        {(log as AuditLog).timestamp}
                       </td>
                     </>
                   )}

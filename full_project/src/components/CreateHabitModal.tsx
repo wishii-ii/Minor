@@ -80,7 +80,7 @@ export const CreateHabitModal: React.FC<CreateHabitModalProps> = ({ onClose }) =
             </label>
             <select
               value={formData.frequency}
-              onChange={(e) => setFormData(prev => ({ ...prev, frequency: e.target.value as any }))}
+              onChange={(e) => setFormData(prev => ({ ...prev, frequency: e.target.value as 'daily' | 'weekly' }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
               <option value="daily">Daily</option>

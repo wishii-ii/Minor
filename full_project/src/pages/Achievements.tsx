@@ -22,10 +22,10 @@ export const Achievements: React.FC = () => {
 
       {/* Filter Tabs */}
       <div className="flex gap-4 mb-6">
-        {['all', 'earned', 'locked'].map((filterType) => (
+        {(['all', 'earned', 'locked'] as const).map((filterType) => (
           <button
             key={filterType}
-            onClick={() => setFilter(filterType as any)}
+            onClick={() => setFilter(filterType)}
             className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${filter === filterType
               ? 'bg-purple-100 text-purple-700'
               : 'text-gray-600 hover:bg-gray-100'
@@ -46,7 +46,19 @@ export const Achievements: React.FC = () => {
   );
 };
 
-const AchievementCard: React.FC<{ achievement: any }> = ({ achievement }) => {
+interface Achievement {
+  id: string;
+  name: string;
+  description?: string;
+  earned?: boolean;
+  tier?: string;
+  icon?: string;
+  progress?: number;
+  requirement?: number;
+  earnedAt?: string;
+}
+
+const AchievementCard: React.FC<{ achievement: Achievement }> = ({ achievement }) => {
   const tierColors = {
     bronze: 'from-orange-400 to-orange-600',
     silver: 'from-gray-400 to-gray-600',
@@ -88,7 +100,7 @@ const AchievementCard: React.FC<{ achievement: any }> = ({ achievement }) => {
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div
               className="bg-gradient-to-r from-purple-500 to-indigo-600 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${(achievement.progress / achievement.requirement) * 100}%` }}
+              style={{ width: `${((achievement.progress ?? 0) / (achievement.requirement ?? 1)) * 100}%` }}
             />
           </div>
         </div>

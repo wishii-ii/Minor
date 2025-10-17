@@ -1,28 +1,9 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { auth, signInWithGoogle, signOutCurrentUser, db } from '../firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
-
-interface User {
-  id: string;
-  email: string;
-  displayName: string;
-  avatar: string;
-  level: number;
-  xp: number;
-  xpToNext: number;
-  streakCount: number;
-  joinDate: string;
-  status: 'online' | 'away' | 'offline';
-}
-
-interface UserContextType {
-  user: User | null;
-  updateUser: (updates: Partial<User>) => Promise<void>;
-  addXP: (amount: number) => Promise<void>;
-  signIn: () => Promise<void>;
-  signOut: () => Promise<void>;
-}
+import { User, UserContextType } from '../types/models';
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
@@ -66,7 +47,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateUser = async (updates: Partial<User>) => {
     if (!user) return;
     const userRef = doc(db, 'users', user.id);
-    await updateDoc(userRef, updates as any);
+    await updateDoc(userRef, updates as unknown as Partial<Record<string, unknown>>);
     setUser(prev => prev ? { ...prev, ...updates } as User : prev);
   };
 
@@ -86,7 +67,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       xp: newXP,
       level: newLevel,
       xpToNext: newXPToNext,
-    } as any);
+    } as unknown as Partial<Record<string, unknown>>);
 
     setUser(prev => prev ? { ...prev, xp: newXP, level: newLevel, xpToNext: newXPToNext } : prev);
   };
@@ -95,13 +76,45 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await signInWithGoogle();
   };
 
+  const signInWithAvatar = async (avatar: string) => {
+    // Use the existing Google sign-in helper but supply the chosen avatar
+    // when creating a new Firestore user document. We rely on the
+    // onAuthStateChanged handler above to create the user doc; to pass the
+    // avatar through we write it immediately after sign-in if the doc is new.
+    const prevUser = auth.currentUser;
+    await signInWithGoogle();
+
+    // After sign-in, check if there is a user and whether their document exists.
+    const fbUser = auth.currentUser || prevUser;
+    if (!fbUser) return;
+
+    const userRef = doc(db, 'users', fbUser.uid);
+    const snap = await getDoc(userRef);
+    if (!snap.exists()) {
+      const newUser: User = {
+        id: fbUser.uid,
+        email: fbUser.email || '',
+        displayName: fbUser.displayName || 'New Adventurer',
+        avatar: avatar || '🧙‍♂️',
+        level: 1,
+        xp: 0,
+        xpToNext: 500,
+        streakCount: 0,
+        joinDate: new Date().toISOString(),
+        status: 'online',
+      };
+      await setDoc(userRef, newUser);
+      setUser(newUser);
+    }
+  };
+
   const signOut = async () => {
     await signOutCurrentUser();
     setUser(null);
   };
 
   return (
-    <UserContext.Provider value={{ user, updateUser, addXP, signIn, signOut }}>
+    <UserContext.Provider value={{ user, updateUser, addXP, signIn, signInWithAvatar, signOut }}>
       {children}
     </UserContext.Provider>
   );

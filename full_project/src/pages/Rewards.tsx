@@ -4,27 +4,28 @@ import { FaCoins, FaUser, FaGift, FaPalette } from 'react-icons/fa';
 
 
 export const Rewards: React.FC = () => {
-  const [selectedCategory, setSelectedCategory] = useState<'avatars' | 'treats' | 'themes'>('avatars');
+  type CategoryKey = 'avatars' | 'treats' | 'themes';
+  const [selectedCategory, setSelectedCategory] = useState<CategoryKey>('avatars');
 
   // Mock currency system - could be XP points or separate reward points
   const rewardPoints = 450;
 
   const rewards = {
     avatars: [
-      { id: 1, name: 'Wizard Robes', price: 100, owned: true, icon: '🧙‍♂️', rarity: 'common' },
-      { id: 2, name: 'Knight Armor', price: 200, owned: false, icon: '⚔️', rarity: 'rare' },
-      { id: 3, name: 'Dragon Wings', price: 500, owned: false, icon: '🐉', rarity: 'legendary' },
-      { id: 4, name: 'Phoenix Feathers', price: 300, owned: false, icon: '🔥', rarity: 'epic' },
+      { id: 1, name: 'Wizard Robes', price: 100, owned: true, icon: '🧙‍♂️', rarity: 'common' as const },
+      { id: 2, name: 'Knight Armor', price: 200, owned: false, icon: '⚔️', rarity: 'rare' as const },
+      { id: 3, name: 'Dragon Wings', price: 500, owned: false, icon: '🐉', rarity: 'legendary' as const },
+      { id: 4, name: 'Phoenix Feathers', price: 300, owned: false, icon: '🔥', rarity: 'epic' as const },
     ],
     treats: [
-      { id: 5, name: 'Coffee Break', price: 50, owned: false, icon: '☕', rarity: 'common', description: 'Treat yourself to your favorite coffee' },
-      { id: 6, name: 'Movie Night', price: 150, owned: false, icon: '🎬', rarity: 'rare', description: 'Enjoy a relaxing movie evening' },
-      { id: 7, name: 'Spa Day', price: 400, owned: false, icon: '🧘‍♀️', rarity: 'legendary', description: 'A full day of self-care and relaxation' },
+      { id: 5, name: 'Coffee Break', price: 50, owned: false, icon: '☕', rarity: 'common' as const, description: 'Treat yourself to your favorite coffee' },
+      { id: 6, name: 'Movie Night', price: 150, owned: false, icon: '🎬', rarity: 'rare' as const, description: 'Enjoy a relaxing movie evening' },
+      { id: 7, name: 'Spa Day', price: 400, owned: false, icon: '🧘‍♀️', rarity: 'legendary' as const, description: 'A full day of self-care and relaxation' },
     ],
     themes: [
-      { id: 8, name: 'Dark Mode', price: 75, owned: true, icon: '🌙', rarity: 'common' },
-      { id: 9, name: 'Forest Theme', price: 125, owned: false, icon: '🌲', rarity: 'rare' },
-      { id: 10, name: 'Galaxy Theme', price: 250, owned: false, icon: '✨', rarity: 'epic' },
+      { id: 8, name: 'Dark Mode', price: 75, owned: true, icon: '🌙', rarity: 'common' as const },
+      { id: 9, name: 'Forest Theme', price: 125, owned: false, icon: '🌲', rarity: 'rare' as const },
+      { id: 10, name: 'Galaxy Theme', price: 250, owned: false, icon: '✨', rarity: 'epic' as const },
     ]
   };
 
@@ -53,14 +54,14 @@ export const Rewards: React.FC = () => {
 
       {/* Categories */}
       <div className="flex gap-4 mb-8">
-        {[
-          { key: 'avatars', label: 'Avatars', icon: <FaUser /> },
-          { key: 'treats', label: 'Real-Life Treats', icon: <FaGift /> },
-          { key: 'themes', label: 'Themes', icon: <FaPalette /> }
-        ].map((category) => (
+        {([
+          { key: 'avatars' as CategoryKey, label: 'Avatars', icon: <FaUser /> },
+            { key: 'treats' as CategoryKey, label: 'Real-Life Treats', icon: <FaGift /> },
+            { key: 'themes' as CategoryKey, label: 'Themes', icon: <FaPalette /> }
+        ] as const).map((category) => (
           <button
             key={category.key}
-            onClick={() => setSelectedCategory(category.key as any)}
+            onClick={() => setSelectedCategory(category.key)}
             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${selectedCategory === category.key
               ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-lg'
               : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
@@ -104,8 +105,10 @@ export const Rewards: React.FC = () => {
   );
 };
 
+type Reward = { id: number; name: string; price: number; owned?: boolean; icon?: string; rarity: 'common' | 'rare' | 'epic' | 'legendary'; description?: string };
+
 const RewardCard: React.FC<{
-  reward: any;
+  reward: Reward;
   // userPoints: number;
   canAfford: boolean;
   rarityStyle: string;

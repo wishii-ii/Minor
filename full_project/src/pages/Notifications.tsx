@@ -93,7 +93,7 @@ export const Notifications: React.FC = () => {
         ].map((filterOption) => (
           <button
             key={filterOption.key}
-            onClick={() => setFilter(filterOption.key as any)}
+            onClick={() => setFilter(filterOption.key as 'all' | 'unread' | 'achievements' | 'quests')}
             className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${filter === filterOption.key
               ? 'bg-purple-100 text-purple-700'
               : 'text-gray-600 hover:bg-gray-100'
