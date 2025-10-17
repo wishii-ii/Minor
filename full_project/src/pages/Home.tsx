@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useRef } from 'react';
 import { FaPlusCircle, FaFire, FaTrophy, FaUsers, FaFlagCheckered } from 'react-icons/fa';
 
 
@@ -8,6 +7,14 @@ interface HomeProps {
 }
 
 export const Home: React.FC<HomeProps> = ({ onAuth }) => {
+  // 1. Create a ref to attach to the features section
+  const featuresRef = useRef<HTMLDivElement>(null);
+
+  // 2. Handler function to scroll to the ref's position
+  const handleScrollToFeatures = () => {
+    featuresRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100">
       {/* Hero Section */}
@@ -42,7 +49,11 @@ export const Home: React.FC<HomeProps> = ({ onAuth }) => {
               >
                 Log In
               </button>
-              <button className="border-2 border-purple-300 text-purple-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-purple-50 transition-all duration-200">
+              {/* Attach the scroll handler */}
+              <button
+                onClick={handleScrollToFeatures}
+                className="border-2 border-purple-300 text-purple-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-purple-50 transition-all duration-200"
+              >
                 Explore Features
               </button>
             </div>
@@ -50,8 +61,8 @@ export const Home: React.FC<HomeProps> = ({ onAuth }) => {
         </div>
       </div>
 
-      {/* Features Section */}
-      <div className="max-w-6xl mx-auto px-4 py-20">
+      {/* Features Section - Attach the ref here */}
+      <div ref={featuresRef} className="max-w-6xl mx-auto px-4 py-20">
         <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">
           Turn Daily Goals Into Epic Adventures
         </h2>

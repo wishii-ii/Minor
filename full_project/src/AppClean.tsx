@@ -9,17 +9,15 @@ import { Dashboard } from './pages/Dashboard';
 import Habits from './pages/Habits';
 import { Progress } from './pages/Progress';
 import { Achievements } from './pages/Achievements';
-import { Quests } from './pages/Quests';
+// FIX: Changed import for Quests from named import ({ Quests }) to default import (Quests)
+import Quests from './pages/Quests'; 
 import { Teams } from './pages/Teams';
-import { Leaderboards } from './pages/Leaderboards';
 import Messages from './pages/Messages';
 import { Notifications } from './pages/Notifications';
 import { Rewards } from './pages/Rewards';
 import { Settings } from './pages/Settings';
-import { AdminLogs } from './pages/AdminLogs';
 import { Friends } from './pages/Friends';
-import { Profile } from './pages/Profile';
-import { TestLab } from './pages/TestLab';
+import {Profile} from './pages/Profile';
 import { Home } from './pages/Home';
 import Auth from './pages/Auth';
 
@@ -88,8 +86,6 @@ function MainApp(): React.ReactElement {
         return <Quests />;
       case 'teams':
         return <Teams />;
-      case 'leaderboards':
-        return <Leaderboards />;
       case 'messages':
         return <Messages />;
       case 'notifications':
@@ -98,14 +94,10 @@ function MainApp(): React.ReactElement {
         return <Rewards />;
       case 'settings':
         return <Settings />;
-      case 'admin':
-        return <AdminLogs />;
       case 'friends':
         return <Friends />;
       case 'profile':
         return <Profile />;
-      case 'test-lab':
-        return <TestLab />;
       default:
         return <Dashboard />;
     }

@@ -1,14 +1,52 @@
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaFlag, FaUsers, FaClock, FaLock } from 'react-icons/fa';
 import { useUser } from '../contexts/UserContext';
+import { db } from '../firebase'; // Import db
+import { collection, onSnapshot } from 'firebase/firestore'; // Import Firestore helpers
 
+// The environment variables in .env.local are accessible via import.meta.env
 
-export const Quests: React.FC = () => {
+// FIX: Removed 'export' keyword from the component definition. 
+// It will now be exported as the default export at the end of the file.
+const Quests: React.FC = () => {
   const { user } = useUser();
+  const [availableQuests, setAvailableQuests] = useState<any[]>([]);
+  
   const userLevel = user?.level ?? 0;
+  // Calculate XP needed to reach level 5. Assuming 500 XP per level after level 1.
   const xpToLevel5 = user ? Math.max(0, (5 * 500) - (user.xp + (user.level - 1) * 500)) : 5 * 500;
 
+  // Retrieve the app identifier from the environment variables (VITE_FIREBASE_PROJECT_ID is a stable unique ID)
+  // We use the project ID as the secure app ID for Firestore pathing.
+  const appId = import.meta.env.VITE_FIREBASE_PROJECT_ID || 'default-app-id';
+
+  // --- Firestore Data Fetching for Quests ---
+  useEffect(() => {
+    if (!db) return;
+    
+    // Quests are public data, accessible by all users of this app.
+    // Path: /artifacts/{appId}/public/data/quests
+    const questsRef = collection(db, `artifacts/${appId}/public/data/quests`);
+
+    // Listen for real-time updates to the quests collection
+    const unsubscribe = onSnapshot(questsRef, (snapshot) => {
+      const quests = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        // Check if the quest is still 'active' or 'available' if you add status fields later.
+        // For now, we assume all documents in this collection are available quests.
+      }));
+      console.log("Fetched quests:", quests);
+      // Since the user asked to remove hardcoded quests and show actual quests, we use the fetched data.
+      setAvailableQuests(quests); 
+    }, (error) => {
+      console.error("Error fetching quests:", error);
+    });
+    
+    return () => unsubscribe();
+  }, [appId]);
+
+  // --- Component Rendering ---
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <div className="mb-6">
@@ -41,39 +79,31 @@ export const Quests: React.FC = () => {
         </div>
       ) : null}
 
-      {/* Active Quests section removed: quests are not available from context */}
-
-      {/* Available Quests */}
+      {/* Available Quests (Dynamically Loaded) */}
       <div className="mb-8">
         <h2 className="text-xl font-bold text-gray-800 mb-4">Available Quests</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <QuestCard
-            title="Mindfulness Mountain"
-            description="Conquer the peaks of inner peace through daily meditation practices"
-            difficulty="easy"
-            participants={12}
-            duration="7 days"
-            rewards={["Zen Master Badge", "300 XP", "Meditation Avatar"]}
-            locked={userLevel < 5}
-          />
-          <QuestCard
-            title="Knowledge Kingdom"
-            description="Unlock the secrets of learning through consistent reading habits"
-            difficulty="medium"
-            participants={8}
-            duration="14 days"
-            rewards={["Scholar Badge", "500 XP", "Book Avatar"]}
-            locked={userLevel < 5}
-          />
-          <QuestCard
-            title="Fitness Fortress"
-            description="Storm the stronghold of strength with daily exercise challenges"
-            difficulty="hard"
-            participants={15}
-            duration="21 days"
-            rewards={["Warrior Badge", "750 XP", "Champion Avatar"]}
-            locked={userLevel < 5}
-          />
+          {availableQuests.length > 0 ? (
+            availableQuests.map(quest => (
+              <QuestCard
+                key={quest.id}
+                title={quest.title}
+                description={quest.description}
+                // Ensure the difficulty is one of the allowed strings or default to 'easy'
+                difficulty={['easy', 'medium', 'hard'].includes(quest.difficulty) ? quest.difficulty : 'easy'}
+                participants={quest.participants || 0}
+                duration={quest.duration}
+                rewards={quest.rewards || []}
+                locked={userLevel < 5} // Quests remain locked until user reaches level 5
+              />
+            ))
+          ) : (
+            <div className="lg:col-span-3 text-center py-12 text-gray-500 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+              <FaFlag className="text-4xl mx-auto mb-3 text-indigo-300" />
+              <p>No quests are currently available.</p>
+              <p className='text-sm mt-1'>Start a new one in the creation section below!</p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -112,6 +142,7 @@ export const Quests: React.FC = () => {
   );
 };
 
+// --- QuestCard Component ---
 const QuestCard: React.FC<{
   title: string;
   description: string;
@@ -173,3 +204,5 @@ const QuestCard: React.FC<{
     </div>
   );
 };
+
+export default Quests;

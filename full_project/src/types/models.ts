@@ -1,3 +1,9 @@
+// src/types/models.ts
+
+// ====================
+// Core Data Interfaces
+// ====================
+
 export interface Quest {
   name: string;
   description: string;
@@ -22,6 +28,15 @@ export interface Habit {
   isActive?: boolean;
   createdAt?: string;
   category?: string;
+  
+  // ADDED: Missing properties for scheduling
+  schedule4Days?: number[]; // Array of day numbers (0-6) when habit is scheduled
+  scheduledDays?: number[]; // Alternative property name
+  schedule?: {
+    type: 'daily' | 'weekly' | 'custom';
+    days?: number[]; // For weekly: [0,1,2,3,4,5,6] where 0=Sunday
+    customSchedule?: any;
+  };
 }
 
 export interface Achievement {
@@ -36,6 +51,10 @@ export interface Achievement {
   earnedAt?: string;
 }
 
+// ====================
+// User & Context Types
+// ====================
+
 export interface User {
   id: string;
   email: string;
@@ -47,31 +66,75 @@ export interface User {
   streakCount: number;
   joinDate: string;
   status: 'online' | 'away' | 'offline';
+
   // virtual currency / coins used in Rewards
   coins?: number;
-  // theme preference persisted per-user
+
+  // optional fields for richer profile handling
   theme?: 'light' | 'dark' | 'auto';
-  // privacy fields
   publicProfile?: boolean;
   showOnLeaderboards?: boolean;
   activityStatus?: boolean;
-  // list of purchased reward ids (e.g., avatar/theme ids)
+
+  // inventory + unlocks
   purchasedRewardIds?: number[];
+
+  // additional metadata used in Dashboard & context
+  achievements?: string[];
+  lastLoginDate?: string;
+  deleted?: boolean;
+  deletedAt?: string;
 }
 
 export interface UserContextType {
   user: User | null;
+
+  // Update user fields in Firestore and local state
   updateUser: (updates: Partial<User>) => Promise<void>;
+
+  // Add XP and automatically handle level ups
   addXP: (amount: number) => Promise<void>;
-  // spend coins, returns true when purchase succeeded
+
+  // Spend coins; returns true if the purchase succeeds
   spendCoins: (amount: number) => Promise<boolean>;
-  // add coins to the user's balance (e.g., when earning rewards)
+
+  // Add coins to the user's wallet
   addCoins: (amount: number) => Promise<void>;
-  // persist a purchased reward id to the user profile
+
+  // Record a purchased reward ID in user data
   addPurchaseId: (rewardId: number) => Promise<void>;
-  // delete the user's account (Firestore doc + sign out)
+
+  // Mark account deleted and sign out
   deleteAccount: () => Promise<void>;
+
+  // Authentication
   signIn: () => Promise<void>;
   signInWithAvatar: (avatar: string) => Promise<void>;
   signOut: () => Promise<void>;
+}
+
+// ====================
+// Additional Types for Data Context
+// ====================
+
+export interface DataContextType {
+  habits: Habit[];
+  achievements: Achievement[];
+  quests: Quest[];
+  
+  // Habit operations
+  completeHabit: (habitId: string) => Promise<void>;
+  addHabit: (habit: Omit<Habit, 'id'>) => Promise<void>;
+  updateHabit: (habitId: string, updates: Partial<Habit>) => Promise<void>;
+  deleteHabit: (habitId: string) => Promise<void>;
+  
+  // Achievement operations
+  unlockAchievement: (achievementId: string) => Promise<void>;
+  
+  // Quest operations
+  updateQuestProgress: (questName: string, progress: number) => Promise<void>;
+  
+  // Loading states
+  loading: boolean;
+  error: string | null;
 }
