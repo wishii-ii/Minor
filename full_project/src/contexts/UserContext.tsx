@@ -1,4 +1,7 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { auth, signInWithGoogle, signOutCurrentUser, db } from '../firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 
 interface User {
   id: string;
@@ -15,55 +18,90 @@ interface User {
 
 interface UserContextType {
   user: User | null;
-  updateUser: (updates: Partial<User>) => void;
-  addXP: (amount: number) => void;
+  updateUser: (updates: Partial<User>) => Promise<void>;
+  addXP: (amount: number) => Promise<void>;
+  signIn: () => Promise<void>;
+  signOut: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>({
-    id: 'user-1',
-    email: 'adventurer@habitora.com',
-    displayName: 'Habit Hero',
-    avatar: '🧙‍♂️',
-    level: 8,
-    xp: 2340,
-    xpToNext: 2500,
-    streakCount: 15,
-    joinDate: '2024-01-15',
-    status: 'online'
-  });
+  const [user, setUser] = useState<User | null>(null);
 
-  const updateUser = (updates: Partial<User>) => {
-    setUser(prev => prev ? { ...prev, ...updates } : null);
-  };
-
-  const addXP = (amount: number) => {
-    setUser(prev => {
-      if (!prev) return null;
-      let newXP = prev.xp + amount;
-      let newLevel = prev.level;
-      let newXPToNext = prev.xpToNext;
-
-      // Level up logic
-      while (newXP >= newXPToNext) {
-        newXP -= newXPToNext;
-        newLevel += 1;
-        newXPToNext = newLevel * 500; // XP needed increases with level
+  // Listen for Firebase auth state changes
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
+      if (!fbUser) {
+        setUser(null);
+        return;
       }
 
-      return {
-        ...prev,
-        xp: newXP,
-        level: newLevel,
-        xpToNext: newXPToNext
-      };
+      // Load or create Firestore user profile
+      const userRef = doc(db, 'users', fbUser.uid);
+      const snap = await getDoc(userRef);
+      if (!snap.exists()) {
+        const newUser: User = {
+          id: fbUser.uid,
+          email: fbUser.email || '',
+          displayName: fbUser.displayName || 'New Adventurer',
+          avatar: '🧙‍♂️',
+          level: 1,
+          xp: 0,
+          xpToNext: 500,
+          streakCount: 0,
+          joinDate: new Date().toISOString(),
+          status: 'online',
+        };
+        await setDoc(userRef, newUser);
+        setUser(newUser);
+      } else {
+        setUser(snap.data() as User);
+      }
     });
+
+    return () => unsubscribe();
+  }, []);
+
+  const updateUser = async (updates: Partial<User>) => {
+    if (!user) return;
+    const userRef = doc(db, 'users', user.id);
+    await updateDoc(userRef, updates as any);
+    setUser(prev => prev ? { ...prev, ...updates } as User : prev);
+  };
+
+  const addXP = async (amount: number) => {
+    if (!user) return;
+    // optimistic local update
+    let newXP = user.xp + amount;
+    let newLevel = user.level;
+    let newXPToNext = user.xpToNext;
+    while (newXP >= newXPToNext) {
+      newXP -= newXPToNext;
+      newLevel += 1;
+      newXPToNext = newLevel * 500;
+    }
+
+    await updateDoc(doc(db, 'users', user.id), {
+      xp: newXP,
+      level: newLevel,
+      xpToNext: newXPToNext,
+    } as any);
+
+    setUser(prev => prev ? { ...prev, xp: newXP, level: newLevel, xpToNext: newXPToNext } : prev);
+  };
+
+  const signIn = async () => {
+    await signInWithGoogle();
+  };
+
+  const signOut = async () => {
+    await signOutCurrentUser();
+    setUser(null);
   };
 
   return (
-    <UserContext.Provider value={{ user, updateUser, addXP }}>
+    <UserContext.Provider value={{ user, updateUser, addXP, signIn, signOut }}>
       {children}
     </UserContext.Provider>
   );
