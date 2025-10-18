@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FaMedal, FaStar } from 'react-icons/fa';
 import { useData } from '../contexts/DataContext';
-
+import { BaseLayout } from '../components/BaseLayout';
 
 export const Achievements: React.FC = () => {
   const { achievements } = useData();
@@ -14,10 +14,10 @@ export const Achievements: React.FC = () => {
   });
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <BaseLayout className="p-6 max-w-6xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Achievements</h1>
-        <p className="text-gray-600">Your journey to greatness, one badge at a time</p>
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Achievements</h1>
+        <p className="text-gray-600 dark:text-gray-300">Your journey to greatness, one badge at a time</p>
       </div>
 
       {/* Filter Tabs */}
@@ -26,10 +26,11 @@ export const Achievements: React.FC = () => {
           <button
             key={filterType}
             onClick={() => setFilter(filterType)}
-            className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${filter === filterType
-              ? 'bg-purple-100 text-purple-700'
-              : 'text-gray-600 hover:bg-gray-100'
-              }`}
+            className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+              filter === filterType
+                ? 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+            }`}
           >
             {filterType.charAt(0).toUpperCase() + filterType.slice(1)}
           </button>
@@ -42,7 +43,7 @@ export const Achievements: React.FC = () => {
           <AchievementCard key={achievement.id} achievement={achievement} />
         ))}
       </div>
-    </div>
+    </BaseLayout>
   );
 };
 
@@ -67,22 +68,32 @@ const AchievementCard: React.FC<{ achievement: Achievement }> = ({ achievement }
   };
 
   return (
-    <div className={`bg-white rounded-xl p-6 shadow-md border-2 transition-all duration-200 hover:shadow-lg ${achievement.earned
-      ? 'border-green-200 bg-gradient-to-br from-green-50 to-white'
-      : 'border-gray-200'
-      }`}>
+    <div className={`rounded-xl p-6 shadow-md border-2 transition-all duration-200 hover:shadow-lg ${
+      achievement.earned
+        ? 'border-green-200 dark:border-green-800 bg-gradient-to-br from-green-50 to-white dark:from-green-900/20 dark:to-gray-800'
+        : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'
+    }`}>
       <div className="flex items-center gap-4 mb-4">
-        <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl ${achievement.earned
-          ? `bg-gradient-to-br ${tierColors[achievement.tier as keyof typeof tierColors]} text-white shadow-lg`
-          : 'bg-gray-200 text-gray-400'
-          }`}>
+        <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl ${
+          achievement.earned
+            ? `bg-gradient-to-br ${tierColors[achievement.tier as keyof typeof tierColors]} text-white shadow-lg`
+            : 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500'
+        }`}>
           {achievement.earned ? achievement.icon : <FaMedal size={32} />}
         </div>
         <div className="flex-1">
-          <h3 className={`font-bold text-lg ${achievement.earned ? 'text-gray-800' : 'text-gray-500'}`}>
+          <h3 className={`font-bold text-lg ${
+            achievement.earned 
+              ? 'text-gray-800 dark:text-white' 
+              : 'text-gray-500 dark:text-gray-400'
+          }`}>
             {achievement.name}
           </h3>
-          <p className={`text-sm ${achievement.earned ? 'text-gray-600' : 'text-gray-400'}`}>
+          <p className={`text-sm ${
+            achievement.earned 
+              ? 'text-gray-600 dark:text-gray-300' 
+              : 'text-gray-400 dark:text-gray-500'
+          }`}>
             {achievement.description}
           </p>
         </div>
@@ -94,10 +105,12 @@ const AchievementCard: React.FC<{ achievement: Achievement }> = ({ achievement }
       {!achievement.earned && (
         <div className="mt-4">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-gray-600">Progress</span>
-            <span className="text-sm text-gray-500">{achievement.progress}/{achievement.requirement}</span>
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Progress</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              {achievement.progress}/{achievement.requirement}
+            </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
             <div
               className="bg-gradient-to-r from-purple-500 to-indigo-600 h-2 rounded-full transition-all duration-300"
               style={{ width: `${((achievement.progress ?? 0) / (achievement.requirement ?? 1)) * 100}%` }}
@@ -107,7 +120,7 @@ const AchievementCard: React.FC<{ achievement: Achievement }> = ({ achievement }
       )}
 
       {achievement.earned && achievement.earnedAt && (
-        <p className="text-xs text-green-600 mt-4">
+        <p className="text-xs text-green-600 dark:text-green-400 mt-4">
           Earned on {new Date(achievement.earnedAt).toLocaleDateString()}
         </p>
       )}

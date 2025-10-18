@@ -1,3 +1,27 @@
+/* index.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Ensure smooth transitions for dark mode */
+* {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Custom dark mode scrollbar */
+.dark ::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #1f2937;  /* Fixed: removed brackets */
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #4b5563;  /* Fixed: removed brackets */
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;  /* Fixed: removed brackets */
+}

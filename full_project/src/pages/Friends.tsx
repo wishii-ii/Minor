@@ -9,10 +9,11 @@ import {
   deleteDoc, 
   onSnapshot 
 } from 'firebase/firestore';
-import { db, firebaseEnabled } from '../firebase'; // Adjust path as needed
+import { db, firebaseEnabled } from '../firebase';
 import { useUser } from '../contexts/UserContext';
 import { FaUserPlus, FaSearch, FaCheck, FaTimes } from 'react-icons/fa';
-import { User } from '../types/models'; // Import your User type
+import { User } from '../types/models';
+import { BaseLayout } from '../components/BaseLayout';
 
 // Type definitions that extend your existing types
 interface Friend {
@@ -51,12 +52,12 @@ const FriendCard: React.FC<{
   onRemove: (friendId: string, friendName: string) => void;
 }> = ({ friend, isFriend, onRemove }) => {
   return (
-    <div className="bg-white rounded-xl p-4 shadow-md border border-gray-200 flex items-center justify-between">
+    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md border border-gray-200 dark:border-gray-700 flex items-center justify-between">
       <div className="flex items-center gap-4">
         <span className="text-3xl">{friend.avatar}</span>
         <div>
-          <h3 className="font-bold text-gray-800">{friend.name}</h3>
-          <p className="text-sm text-gray-600">
+          <h3 className="font-bold text-gray-800 dark:text-white">{friend.name}</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
             Level {friend.level} • {friend.currentStreak} day streak • {friend.mutualTeams} mutual teams
           </p>
         </div>
@@ -64,7 +65,7 @@ const FriendCard: React.FC<{
       {isFriend && (
         <button 
           onClick={() => onRemove(friend.id, friend.name)}
-          className="bg-red-100 text-red-600 px-4 py-2 rounded-lg font-medium hover:bg-red-200 transition-colors"
+          className="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-4 py-2 rounded-lg font-medium hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
         >
           Remove
         </button>
@@ -84,13 +85,13 @@ const ConfirmModal: React.FC<{
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
-        <h2 className="text-xl font-bold text-gray-800 mb-2">{title}</h2>
-        <p className="text-gray-600 mb-6">{message}</p>
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4">
+        <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-2">{title}</h2>
+        <p className="text-gray-600 dark:text-gray-300 mb-6">{message}</p>
         <div className="flex gap-3 justify-end">
           <button 
             onClick={onCancel}
-            className="px-4 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+            className="px-4 py-2 text-gray-600 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
           >
             Cancel
           </button>
@@ -418,11 +419,11 @@ export const Friends: React.FC = () => {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <BaseLayout className="p-6 max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Friends</h1>
-          <p className="text-gray-600">Connect with fellow adventurers on your growth journey</p>
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Friends</h1>
+          <p className="text-gray-600 dark:text-gray-300">Connect with fellow adventurers on your growth journey</p>
         </div>
 
         <button 
@@ -442,17 +443,17 @@ export const Friends: React.FC = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search for users by name or email (min. 2 characters)..."
-          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+          className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
         />
       </div>
 
       <div className="grid lg:grid-cols-3 gap-8">
         {/* Friends List */}
         <div className="lg:col-span-2">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Your Friends ({fetchedFriends.length})</h2>
+          <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">Your Friends ({fetchedFriends.length})</h2>
           <div className="space-y-4">
             {isLoading ? (
-              <div className="text-center py-8 text-gray-500">Loading your friends...</div>
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">Loading your friends...</div>
             ) : fetchedFriends.length > 0 ? (
               fetchedFriends.map((friend: Friend) => (
                 <FriendCard
@@ -463,7 +464,7 @@ export const Friends: React.FC = () => {
                 />
               ))
             ) : (
-              <div className="text-center py-8 text-gray-500 border border-dashed p-6 rounded-xl">
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400 border border-dashed border-gray-300 dark:border-gray-600 p-6 rounded-xl">
                 You don't have any friends yet. Use the search bar to find people!
               </div>
             )}
@@ -474,8 +475,8 @@ export const Friends: React.FC = () => {
         <div className="space-y-6">
           {/* Friend Requests */}
           {friendRequests.length > 0 && (
-            <div className="bg-white rounded-xl p-6 shadow-md border border-red-100">
-              <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md border border-red-100 dark:border-red-900/30">
+              <h3 className="font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
                 <FaUserPlus className='text-red-500' />
                 Friend Requests ({friendRequests.length})
               </h3>
@@ -485,21 +486,21 @@ export const Friends: React.FC = () => {
                     <div className="flex items-center gap-3">
                       <span className="text-2xl">{request.avatar}</span>
                       <div>
-                        <p className="font-medium text-gray-800">{request.name}</p>
-                        <p className="text-xs text-gray-500">Level {request.level}</p>
+                        <p className="font-medium text-gray-800 dark:text-white">{request.name}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Level {request.level}</p>
                       </div>
                     </div>
                     <div className="flex gap-2">
                       <button 
                         onClick={() => handleAcceptRequest(request.id, request.senderId)}
-                        className="bg-green-100 text-green-700 p-2 rounded-lg text-sm font-medium hover:bg-green-200 transition-colors"
+                        className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 p-2 rounded-lg text-sm font-medium hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors"
                         title="Accept Request"
                       >
                         <FaCheck />
                       </button>
                       <button 
                         onClick={() => handleDeclineRequest(request.id)}
-                        className="bg-red-100 text-red-600 p-2 rounded-lg text-sm font-medium hover:bg-red-200 transition-colors"
+                        className="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-2 rounded-lg text-sm font-medium hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
                         title="Decline Request"
                       >
                         <FaTimes />
@@ -512,15 +513,15 @@ export const Friends: React.FC = () => {
           )}
 
           {/* Search Results */}
-          <div className="bg-white rounded-xl p-6 shadow-md border border-indigo-100">
-            <h3 className="font-bold text-gray-800 mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md border border-indigo-100 dark:border-indigo-900/30">
+            <h3 className="font-bold text-gray-800 dark:text-white mb-4">
               {searchTerm.length > 1 ? 'Search Results' : 'Find Users'}
             </h3>
             <div className="space-y-3">
               {isSearching ? (
-                <div className="text-center text-gray-500">Searching...</div>
+                <div className="text-center text-gray-500 dark:text-gray-400">Searching...</div>
               ) : searchTerm.trim().length > 1 && searchResults.length === 0 ? (
-                <div className="text-center text-gray-500 text-sm">
+                <div className="text-center text-gray-500 dark:text-gray-400 text-sm">
                   No users found matching "{searchTerm.trim()}". 
                 </div>
               ) : searchTerm.trim().length > 1 ? (
@@ -529,8 +530,8 @@ export const Friends: React.FC = () => {
                     <div className="flex items-center gap-3">
                       <span className="text-2xl">{result.avatar}</span>
                       <div>
-                        <p className="font-medium text-gray-800">{result.name}</p>
-                        <p className="text-xs text-gray-500">Level {result.level} • {result.currentStreak} day streak</p>
+                        <p className="font-medium text-gray-800 dark:text-white">{result.name}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Level {result.level} • {result.currentStreak} day streak</p>
                       </div>
                     </div>
                     <button 
@@ -542,7 +543,7 @@ export const Friends: React.FC = () => {
                   </div>
                 ))
               ) : (
-                <div className="text-center text-gray-500 text-sm">
+                <div className="text-center text-gray-500 dark:text-gray-400 text-sm">
                   Type at least 2 characters to search for users
                 </div>
               )}
@@ -558,6 +559,6 @@ export const Friends: React.FC = () => {
         onConfirm={handleExecuteRemove}
         onCancel={handleCancelRemove}
       />
-    </div>
+    </BaseLayout>
   );
 };

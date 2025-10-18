@@ -4,8 +4,10 @@ import { useUser } from '../contexts/UserContext';
 import { useData } from '../contexts/DataContext';
 import { StatsWidget } from '../components/StatsWidget';
 import { Habit } from '../types/models';
+import { BaseLayout } from '../components/BaseLayout';
 
 export const Dashboard: React.FC = () => {
+  
   const { user } = useUser();
   const { habits, completeHabit } = useData();
 
@@ -57,15 +59,15 @@ export const Dashboard: React.FC = () => {
     return (
       <div className="p-6 max-w-7xl mx-auto">
         <div className="text-center py-12">
-          <h2 className="text-2xl font-bold text-gray-600">Please sign in to view your dashboard</h2>
-          <p className="text-gray-500 mt-2">Your progress and habits will appear here once you're signed in.</p>
+          <h2 className="text-2xl font-bold text-gray-600 dark:text-gray-300">Please sign in to view your dashboard</h2>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">Your progress and habits will appear here once you're signed in.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <BaseLayout className="p-6 max-w-7xl mx-auto">
       {/* Welcome Section with avatar fix */}
       <div className="mb-8">
         <div className="flex items-center gap-4 mb-4">
@@ -74,19 +76,19 @@ export const Dashboard: React.FC = () => {
             <img
               src={user.avatar}
               alt={user.displayName}
-              className="w-16 h-16 rounded-full border-2 border-indigo-200 object-cover"
+              className="w-16 h-16 rounded-full border-2 border-indigo-200 dark:border-indigo-600 object-cover"
             />
           ) : (
             // If avatar is an emoji or text
-            <div className="w-16 h-16 rounded-full border-2 border-indigo-200 bg-indigo-500 flex items-center justify-center text-white text-2xl">
+            <div className="w-16 h-16 rounded-full border-2 border-indigo-200 dark:border-indigo-600 bg-indigo-500 flex items-center justify-center text-white text-2xl">
               {user.avatar || user.displayName?.charAt(0) || 'U'}
             </div>
           )}
           <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-1">
+            <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-1">
               Welcome back, {user.displayName}!
             </h1>
-            <p className="text-gray-600 flex items-center gap-2">
+            <p className="text-gray-600 dark:text-gray-300 flex items-center gap-2">
               <span className={`w-2 h-2 rounded-full ${
                 user.status === 'online' ? 'bg-green-500' :
                 user.status === 'away' ? 'bg-yellow-500' : 'bg-gray-400'
@@ -95,7 +97,7 @@ export const Dashboard: React.FC = () => {
             </p>
           </div>
         </div>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-300">
           {todaysHabits.length > 0 
             ? `You have ${todaysHabits.length} habit${todaysHabits.length === 1 ? '' : 's'} to complete today.`
             : 'No habits to complete today. Add some habits to start tracking your progress!'
@@ -140,11 +142,11 @@ export const Dashboard: React.FC = () => {
       <div className="grid lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+            <h2 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
               <FaCalendarCheck className="text-purple-500" />
               Today's Habits ({todaysHabits.length})
             </h2>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-gray-500 dark:text-gray-400">
               {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
             </span>
           </div>
@@ -153,21 +155,21 @@ export const Dashboard: React.FC = () => {
               todaysHabits.map((habit: Habit) => (
                 <div 
                   key={habit.id} 
-                  className={`bg-white rounded-lg border-2 p-4 shadow-sm transition-all ${
+                  className={`rounded-lg border-2 p-4 shadow-sm transition-all ${
                     isHabitCompletedToday(habit) 
-                      ? 'border-green-500 bg-green-50' 
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-green-500 bg-green-50 dark:bg-green-900/20 dark:border-green-700' 
+                      : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-800 text-lg flex items-center gap-2">
+                      <h3 className="font-semibold text-gray-800 dark:text-white text-lg flex items-center gap-2">
                         {habit.name}
                         {isHabitCompletedToday(habit) && (
-                          <span className="text-green-500 text-sm">✓ Completed</span>
+                          <span className="text-green-500 dark:text-green-400 text-sm">✓ Completed</span>
                         )}
                       </h3>
-                      <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                      <div className="flex items-center gap-4 mt-2 text-sm text-gray-600 dark:text-gray-300">
                         <span>+{habit.xpReward || 50} XP</span>
                         <span>+{habit.coinReward || 10} Coins</span>
                         <span className="capitalize">{habit.frequency || 'daily'}</span>
@@ -178,7 +180,7 @@ export const Dashboard: React.FC = () => {
                       disabled={isHabitCompletedToday(habit)}
                       className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                         isHabitCompletedToday(habit)
-                          ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                          ? 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
                           : 'bg-green-500 hover:bg-green-600 text-white'
                       }`}
                     >
@@ -188,10 +190,10 @@ export const Dashboard: React.FC = () => {
                 </div>
               ))
             ) : (
-              <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
-                <FaCalendarCheck className="mx-auto text-gray-400 text-4xl mb-3" />
-                <p className="text-gray-500 text-lg font-medium">No habits for today</p>
-                <p className="text-sm text-gray-400 mt-1">Add habits to see them here</p>
+              <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700">
+                <FaCalendarCheck className="mx-auto text-gray-400 dark:text-gray-500 text-4xl mb-3" />
+                <p className="text-gray-500 dark:text-gray-400 text-lg font-medium">No habits for today</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Add habits to see them here</p>
               </div>
             )}
           </div>
@@ -209,27 +211,27 @@ export const Dashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-            <h3 className="font-semibold text-gray-800 mb-3">Today's Summary</h3>
+          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+            <h3 className="font-semibold text-gray-800 dark:text-white mb-3">Today's Summary</h3>
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Habits Completed</span>
-                <span className="font-medium text-green-600">
+                <span className="text-sm text-gray-600 dark:text-gray-300">Habits Completed</span>
+                <span className="font-medium text-green-600 dark:text-green-400">
                   {completedToday} / {todaysHabits.length}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">XP Earned Today</span>
-                <span className="font-medium text-blue-600">+{xpEarnedToday}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-300">XP Earned Today</span>
+                <span className="font-medium text-blue-600 dark:text-blue-400">+{xpEarnedToday}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Current Streak</span>
-                <span className="font-medium text-red-600">{user.streakCount} days</span>
+                <span className="text-sm text-gray-600 dark:text-gray-300">Current Streak</span>
+                <span className="font-medium text-red-600 dark:text-red-400">{user.streakCount} days</span>
               </div>
               {user.joinDate && (
-                <div className="flex justify-between items-center pt-2 border-t border-gray-100">
-                  <span className="text-sm text-gray-600">Member Since</span>
-                  <span className="text-xs font-medium text-gray-500">
+                <div className="flex justify-between items-center pt-2 border-t border-gray-100 dark:border-gray-700">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Member Since</span>
+                  <span className="text-xs font-medium text-gray-500 dark:text-gray-500">
                     {new Date(user.joinDate).toLocaleDateString()}
                   </span>
                 </div>
@@ -237,32 +239,32 @@ export const Dashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-            <h3 className="font-semibold text-gray-800 mb-3">Level Progress</h3>
+          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+            <h3 className="font-semibold text-gray-800 dark:text-white mb-3">Level Progress</h3>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Current Level</span>
-                <span className="font-medium">Lv {user.level}</span>
+                <span className="text-gray-600 dark:text-gray-300">Current Level</span>
+                <span className="font-medium text-gray-800 dark:text-white">Lv {user.level}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Progress to Next</span>
-                <span className="font-medium">
+                <span className="text-gray-600 dark:text-gray-300">Progress to Next</span>
+                <span className="font-medium text-gray-800 dark:text-white">
                   {user.xp} / {user.xpToNext} XP
                 </span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
                 <div 
                   className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300"
                   style={{ width: `${user.xpToNext > 0 ? (user.xp / user.xpToNext) * 100 : 0}%` }}
                 ></div>
               </div>
-              <p className="text-xs text-gray-500 text-center mt-1">
+              <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-1">
                 {user.xpToNext - user.xp} XP needed for level {user.level + 1}
               </p>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </BaseLayout>
   );
 };

@@ -1,7 +1,5 @@
-
 import React from 'react';
-import { FaUser, FaBell, FaPalette, FaLock, FaDatabase } from 'react-icons/fa';
-
+import { FaUser, FaPalette, FaLock, FaDatabase } from 'react-icons/fa';
 import { useUser } from '../contexts/UserContext';
 import { useState, useEffect } from 'react';
 
@@ -9,18 +7,46 @@ export const Settings: React.FC = () => {
   const { user, updateUser, deleteAccount } = useUser();
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
   const [ownedAvatars, setOwnedAvatars] = useState<number[]>([]);
-  const DARK_MODE_ID = 8; // id used in Rewards for Dark Mode
 
+  // Apply theme whenever user or theme changes
   useEffect(() => {
     setSelectedAvatar(user?.avatar || null);
     setOwnedAvatars(user?.purchasedRewardIds ?? []);
+    applyTheme(user?.theme);
   }, [user]);
+
+  const applyTheme = (theme: string | undefined) => {
+    const html = document.documentElement;
+    
+    // Remove both classes first
+    html.classList.remove('light', 'dark');
+    
+    if (theme === 'dark') {
+      html.classList.add('dark');
+    } else if (theme === 'light') {
+      html.classList.add('light');
+    } else if (theme === 'auto') {
+      // Use system preference for auto theme
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        html.classList.add('dark');
+      } else {
+        html.classList.add('light');
+      }
+    } else {
+      // Default to light if no theme set
+      html.classList.add('light');
+    }
+  };
+
+  const handleThemeChange = (theme: 'light' | 'dark' | 'auto') => {
+    updateUser({ theme });
+  };
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Settings</h1>
-        <p className="text-gray-600">Customize your HABITŌRA experience</p>
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Settings</h1>
+        <p className="text-gray-600 dark:text-gray-400">Customize your HABITŌRA experience</p>
       </div>
 
       <div className="space-y-6">
@@ -31,18 +57,18 @@ export const Settings: React.FC = () => {
         >
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Display Name
               </label>
               <input
                 type="text"
                 value={user?.displayName || ''}
                 onChange={(e) => updateUser({ displayName: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Avatar
               </label>
               <div className="flex items-center gap-3">
@@ -50,12 +76,11 @@ export const Settings: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => {
-                      // open small picker: for now toggle between a few built-in avatars
                       const options = ['🧙‍♂️', '⚔️', '🐉', '🔥'];
                       const next = options[(options.indexOf(selectedAvatar || user?.avatar || '🧙‍♂️') + 1) % options.length];
                       setSelectedAvatar(next);
                     }}
-                    className="text-purple-600 font-medium hover:text-purple-700 transition-colors"
+                    className="text-purple-600 dark:text-purple-400 font-medium hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
                   >
                     Change Avatar
                   </button>
@@ -64,7 +89,7 @@ export const Settings: React.FC = () => {
                       if (!selectedAvatar) return;
                       updateUser({ avatar: selectedAvatar });
                     }}
-                    className="text-sm px-3 py-1 bg-indigo-600 text-white rounded-md"
+                    className="text-sm px-3 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
                   >
                     Save
                   </button>
@@ -72,50 +97,27 @@ export const Settings: React.FC = () => {
               </div>
 
               {ownedAvatars.length > 0 && (
-                <div className="mt-3 text-sm text-gray-600">
+                <div className="mt-3 text-sm text-gray-600 dark:text-gray-400">
                   <div className="font-medium mb-1">Purchased Avatars</div>
                   <div className="flex gap-2">
                     {ownedAvatars.filter(id => id >= 1 && id <= 4).map(id => (
-                      <button key={id} onClick={() => {
-                        const map: Record<number, string> = { 1: '🧙‍♂️', 2: '⚔️', 3: '🐉', 4: '🔥' };
-                        const icon = map[id];
-                        setSelectedAvatar(icon);
-                        updateUser({ avatar: icon });
-                      }} className="px-3 py-2 bg-gray-100 rounded-lg">{id === 1 ? '🧙‍♂️' : id === 2 ? '⚔️' : id === 3 ? '🐉' : '🔥'}</button>
+                      <button 
+                        key={id} 
+                        onClick={() => {
+                          const map: Record<number, string> = { 1: '🧙‍♂️', 2: '⚔️', 3: '🐉', 4: '🔥' };
+                          const icon = map[id];
+                          setSelectedAvatar(icon);
+                          updateUser({ avatar: icon });
+                        }} 
+                        className="px-3 py-2 bg-gray-100 dark:bg-gray-600 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-500"
+                      >
+                        {id === 1 ? '🧙‍♂️' : id === 2 ? '⚔️' : id === 3 ? '🐉' : '🔥'}
+                      </button>
                     ))}
                   </div>
                 </div>
               )}
             </div>
-          </div>
-        </SettingsSection>
-
-        {/* Notifications */}
-        <SettingsSection
-          title="Notifications"
-          icon={<FaBell />}
-        >
-          <div className="space-y-4">
-            <ToggleSetting
-              label="Habit Reminders"
-              description="Get notified when it's time to complete your habits"
-              defaultChecked={true}
-            />
-            <ToggleSetting
-              label="Quest Updates"
-              description="Receive notifications about quest progress and team activities"
-              defaultChecked={true}
-            />
-            <ToggleSetting
-              label="Achievement Alerts"
-              description="Celebrate when you unlock new badges and milestones"
-              defaultChecked={true}
-            />
-            <ToggleSetting
-              label="Team Messages"
-              description="Get notified about messages from your team members"
-              defaultChecked={false}
-            />
           </div>
         </SettingsSection>
 
@@ -126,32 +128,44 @@ export const Settings: React.FC = () => {
         >
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                 Theme
               </label>
               <div className="grid grid-cols-3 gap-3">
                 <button
-                  onClick={() => updateUser({ theme: 'light' })}
-                  className={`p-3 rounded-lg border-2 font-medium transition-all duration-200 ${user?.theme === 'light' ? 'border-purple-500 bg-purple-50 text-purple-700' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
+                  onClick={() => handleThemeChange('light')}
+                  className={`p-3 rounded-lg border-2 font-medium transition-all duration-200 ${
+                    user?.theme === 'light' 
+                      ? 'border-purple-500 bg-purple-50 dark:bg-purple-900 text-purple-700 dark:text-purple-300' 
+                      : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  }`}
+                >
                   Light
                 </button>
                 <button
-                  onClick={() => {
-                    // only allow dark if user purchased the dark mode reward
-                    if (!user?.purchasedRewardIds?.includes(DARK_MODE_ID)) return;
-                    updateUser({ theme: 'dark' });
-                  }}
-                  className={`p-3 rounded-lg border-2 font-medium transition-all duration-200 ${user?.theme === 'dark' ? 'border-purple-500 bg-purple-50 text-purple-700' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}
-                  disabled={!user?.purchasedRewardIds?.includes(DARK_MODE_ID)}
+                  onClick={() => handleThemeChange('dark')}
+                  className={`p-3 rounded-lg border-2 font-medium transition-all duration-200 ${
+                    user?.theme === 'dark' 
+                      ? 'border-purple-500 bg-purple-50 dark:bg-purple-900 text-purple-700 dark:text-purple-300' 
+                      : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  }`}
                 >
-                  Dark {user?.purchasedRewardIds?.includes(DARK_MODE_ID) ? '' : '(Locked)'}
+                  Dark
                 </button>
                 <button
-                  onClick={() => updateUser({ theme: 'auto' })}
-                  className={`p-3 rounded-lg border-2 font-medium transition-all duration-200 ${user?.theme === 'auto' ? 'border-purple-500 bg-purple-50 text-purple-700' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
+                  onClick={() => handleThemeChange('auto')}
+                  className={`p-3 rounded-lg border-2 font-medium transition-all duration-200 ${
+                    user?.theme === 'auto' 
+                      ? 'border-purple-500 bg-purple-50 dark:bg-purple-900 text-purple-700 dark:text-purple-300' 
+                      : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  }`}
+                >
                   Auto
                 </button>
               </div>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                Current theme: {user?.theme || 'light'}
+              </p>
             </div>
           </div>
         </SettingsSection>
@@ -162,54 +176,36 @@ export const Settings: React.FC = () => {
           icon={<FaLock />}
         >
           <div className="space-y-4">
-            <div className="space-y-4">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h4 className="font-medium text-gray-800">Public Profile</h4>
-                  <p className="text-sm text-gray-600">Allow others to view your profile and achievements</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={!!user?.publicProfile}
-                    onChange={(e) => updateUser({ publicProfile: e.target.checked })}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
-                </label>
+            <div className="flex items-start justify-between">
+              <div>
+                <h4 className="font-medium text-gray-800 dark:text-white">Public Profile</h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Allow others to view your profile and achievements</p>
               </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={!!user?.publicProfile}
+                  onChange={(e) => updateUser({ publicProfile: e.target.checked })}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+              </label>
+            </div>
 
-              <div className="flex items-start justify-between">
-                <div>
-                  <h4 className="font-medium text-gray-800">Show on Leaderboards</h4>
-                  <p className="text-sm text-gray-600">Display your progress on public leaderboards</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={!!user?.showOnLeaderboards}
-                    onChange={(e) => updateUser({ showOnLeaderboards: e.target.checked })}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
-                </label>
+            <div className="flex items-start justify-between">
+              <div>
+                <h4 className="font-medium text-gray-800 dark:text-white">Show on Leaderboards</h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Display your progress on public leaderboards</p>
               </div>
-
-              <div className="flex items-start justify-between">
-                <div>
-                  <h4 className="font-medium text-gray-800">Activity Status</h4>
-                  <p className="text-sm text-gray-600">Let team members see when you're online</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={!!user?.activityStatus}
-                    onChange={(e) => updateUser({ activityStatus: e.target.checked })}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
-                </label>
-              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={!!user?.showOnLeaderboards}
+                  onChange={(e) => updateUser({ showOnLeaderboards: e.target.checked })}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+              </label>
             </div>
           </div>
         </SettingsSection>
@@ -221,17 +217,17 @@ export const Settings: React.FC = () => {
         >
           <div className="space-y-4">
             <div>
-              <h4 className="font-medium text-gray-800 mb-2">Export Your Data</h4>
-              <p className="text-sm text-gray-600 mb-4">
+              <h4 className="font-medium text-gray-800 dark:text-white mb-2">Export Your Data</h4>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 Download a copy of your habit data, progress, and achievements
               </p>
-              <button disabled className="bg-gray-200 text-gray-500 px-4 py-2 rounded-lg font-medium transition-all duration-200">
+              <button disabled className="bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-4 py-2 rounded-lg font-medium transition-all duration-200">
                 Export Data (Coming Soon)
               </button>
             </div>
-            <div className="pt-4 border-t border-gray-200">
-              <h4 className="font-medium text-gray-800 mb-2">Delete Account</h4>
-              <p className="text-sm text-gray-600 mb-4">
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-600">
+              <h4 className="font-medium text-gray-800 dark:text-white mb-2">Delete Account</h4>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 Permanently delete your account and all associated data
               </p>
               <button onClick={() => {
@@ -254,37 +250,12 @@ const SettingsSection: React.FC<{
   children: React.ReactNode;
 }> = ({ title, icon, children }) => {
   return (
-    <div className="bg-white rounded-xl p-6 shadow-md border border-indigo-100">
+    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md border border-indigo-100 dark:border-gray-700">
       <div className="flex items-center gap-3 mb-4">
-        <div className="text-purple-600">{icon}</div>
-        <h2 className="text-xl font-bold text-gray-800">{title}</h2>
+        <div className="text-purple-600 dark:text-purple-400">{icon}</div>
+        <h2 className="text-xl font-bold text-gray-800 dark:text-white">{title}</h2>
       </div>
       {children}
     </div>
   );
 };
-
-const ToggleSetting: React.FC<{
-  label: string;
-  description: string;
-  defaultChecked: boolean;
-}> = ({ label, description, defaultChecked }) => {
-  return (
-    <div className="flex items-start justify-between">
-      <div>
-        <h4 className="font-medium text-gray-800">{label}</h4>
-        <p className="text-sm text-gray-600">{description}</p>
-      </div>
-      <label className="relative inline-flex items-center cursor-pointer">
-        <input
-          type="checkbox"
-          defaultChecked={defaultChecked}
-          className="sr-only peer"
-        />
-        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
-      </label>
-    </div>
-  );
-};
-
-// ThemeOption component removed; theme selection is now handled inline above.

@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
 import { FaCoins, FaUser, FaGift, FaPalette } from 'react-icons/fa';
 import { useUser } from '../contexts/UserContext';
-
+import { BaseLayout } from '../components/BaseLayout';
 
 export const Rewards: React.FC = () => {
   type CategoryKey = 'avatars' | 'treats' | 'themes';
@@ -44,10 +43,10 @@ export const Rewards: React.FC = () => {
   };
 
   const rarityColors = {
-    common: 'border-gray-300 bg-gray-50',
-    rare: 'border-blue-300 bg-blue-50',
-    epic: 'border-purple-300 bg-purple-50',
-    legendary: 'border-yellow-300 bg-yellow-50'
+    common: 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800',
+    rare: 'border-blue-300 dark:border-blue-600 bg-blue-50 dark:bg-blue-900/30',
+    epic: 'border-purple-300 dark:border-purple-600 bg-purple-50 dark:bg-purple-900/30',
+    legendary: 'border-yellow-300 dark:border-yellow-600 bg-yellow-50 dark:bg-yellow-900/30'
   };
 
   const handlePurchase = async (rewardId: number, price: number, rewardName: string) => {
@@ -91,11 +90,11 @@ export const Rewards: React.FC = () => {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <BaseLayout className="p-6 max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Rewards Shop</h1>
-          <p className="text-gray-600">Exchange your progress for amazing rewards</p>
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Rewards Shop</h1>
+          <p className="text-gray-600 dark:text-gray-300">Exchange your progress for amazing rewards</p>
         </div>
 
         <div className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-6 py-3 rounded-xl">
@@ -116,10 +115,11 @@ export const Rewards: React.FC = () => {
           <button
             key={category.key}
             onClick={() => setSelectedCategory(category.key)}
-            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${selectedCategory === category.key
-              ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-lg'
-              : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
-              }`}
+            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
+              selectedCategory === category.key
+                ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-lg'
+                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+            }`}
           >
             {category.icon}
             {category.label}
@@ -144,9 +144,9 @@ export const Rewards: React.FC = () => {
       </div>
 
       {/* Earning Tips */}
-      <div className="mt-12 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-6 border border-purple-200">
-        <h3 className="text-lg font-bold text-gray-800 mb-2">💡 How to Earn More Points</h3>
-        <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
+      <div className="mt-12 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-xl p-6 border border-purple-200 dark:border-purple-500/30">
+        <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-2">💡 How to Earn More Points</h3>
+        <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-300">
           <div>
             <p>• Complete daily habits (+10-20 points each)</p>
             <p>• Maintain streaks (+5 bonus per day)</p>
@@ -160,9 +160,9 @@ export const Rewards: React.FC = () => {
         </div>
       </div>
       {notice && (
-        <div className="mt-6 p-3 bg-green-50 border border-green-200 text-green-800 rounded-md max-w-md">{notice}</div>
+        <div className="mt-6 p-3 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-300 rounded-md max-w-md">{notice}</div>
       )}
-    </div>
+    </BaseLayout>
   );
 };
 
@@ -177,45 +177,53 @@ const RewardCard: React.FC<{
   requireSignIn?: boolean;
   onSignIn?: () => void;
 }> = ({ reward, canAfford, rarityStyle, onPurchase, loading, requireSignIn, onSignIn }) => {
+  const rarityLabelColors = {
+    common: 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300',
+    rare: 'bg-blue-200 dark:bg-blue-700 text-blue-700 dark:text-blue-300',
+    epic: 'bg-purple-200 dark:bg-purple-700 text-purple-700 dark:text-purple-300',
+    legendary: 'bg-yellow-200 dark:bg-yellow-700 text-yellow-700 dark:text-yellow-300'
+  };
+
   return (
     <div className={`rounded-xl p-4 border-2 shadow-md hover:shadow-lg transition-all duration-200 ${rarityStyle}`}>
       <div className="text-center mb-4">
         <div className="text-4xl mb-2">{reward.icon}</div>
-        <h3 className="font-bold text-gray-800">{reward.name}</h3>
+        <h3 className="font-bold text-gray-800 dark:text-white">{reward.name}</h3>
         {reward.description && (
-          <p className="text-sm text-gray-600 mt-1">{reward.description}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{reward.description}</p>
         )}
       </div>
 
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-1">
           <FaCoins className="text-yellow-500" />
-          <span className="font-semibold text-gray-800">{reward.price}</span>
+          <span className="font-semibold text-gray-800 dark:text-white">{reward.price}</span>
         </div>
-        <span className={`text-xs px-2 py-1 rounded-full font-medium ${reward.rarity === 'common' ? 'bg-gray-200 text-gray-700' :
-          reward.rarity === 'rare' ? 'bg-blue-200 text-blue-700' :
-            reward.rarity === 'epic' ? 'bg-purple-200 text-purple-700' :
-              'bg-yellow-200 text-yellow-700'
-          }`}>
+        <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+          rarityLabelColors[reward.rarity]
+        }`}>
           {reward.rarity}
         </span>
       </div>
 
       {requireSignIn ? (
         <div className="flex flex-col gap-2">
-          <button onClick={() => onSignIn && onSignIn()} className="w-full py-2 rounded-lg bg-indigo-600 text-white font-medium">Sign in to purchase</button>
-          <div className="text-xs text-gray-500 text-center">You must be signed in to spend coins.</div>
+          <button onClick={() => onSignIn && onSignIn()} className="w-full py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors">
+            Sign in to purchase
+          </button>
+          <div className="text-xs text-gray-500 dark:text-gray-400 text-center">You must be signed in to spend coins.</div>
         </div>
       ) : (
         <button
           onClick={() => onPurchase && onPurchase()}
           disabled={reward.owned || !canAfford || loading}
-          className={`w-full py-2 rounded-lg font-medium transition-all duration-200 ${reward.owned
-            ? 'bg-green-100 text-green-700 cursor-default'
-            : canAfford
-              ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:shadow-lg'
-              : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-            }`}
+          className={`w-full py-2 rounded-lg font-medium transition-all duration-200 ${
+            reward.owned
+              ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 cursor-default'
+              : canAfford
+                ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:shadow-lg'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+          }`}
         >
           {loading ? 'Processing...' : reward.owned ? 'Owned' : canAfford ? 'Purchase' : 'Insufficient Coins'}
         </button>

@@ -6,6 +6,7 @@ import { FaMedal, FaFlag, FaBell, FaUsers, FaInbox } from 'react-icons/fa';
 // Assuming 'db' is imported from your firebase configuration and is typed as Firestore | null
 import { db } from '../firebase'; 
 import { useUser } from '../contexts/UserContext';
+import { BaseLayout } from '../components/BaseLayout';
 import { 
   collection, 
   onSnapshot, 
@@ -34,19 +35,19 @@ interface NotificationData {
   };
 }
 
-// Helper to map notification type to icon and color (from your original data)
+// Helper to map notification type to icon and color (updated for dark theme)
 const getIconAndColor = (type: NotificationData['type']) => {
   switch (type) {
     case 'achievement':
-      return { icon: <FaMedal />, color: 'text-yellow-600 bg-yellow-100' };
+      return { icon: <FaMedal />, color: 'text-yellow-400 bg-yellow-900/30' };
     case 'quest':
-      return { icon: <FaFlag />, color: 'text-purple-600 bg-purple-100' };
+      return { icon: <FaFlag />, color: 'text-purple-400 bg-purple-900/30' };
     case 'reminder':
-      return { icon: <FaBell />, color: 'text-blue-600 bg-blue-100' };
+      return { icon: <FaBell />, color: 'text-blue-400 bg-blue-900/30' };
     case 'social':
-      return { icon: <FaUsers />, color: 'text-green-600 bg-green-100' };
+      return { icon: <FaUsers />, color: 'text-green-400 bg-green-900/30' };
     default:
-      return { icon: <FaInbox />, color: 'text-gray-600 bg-gray-100' };
+      return { icon: <FaInbox />, color: 'text-gray-400 bg-gray-900/30' };
   }
 };
 
@@ -202,17 +203,17 @@ export const Notifications: React.FC = () => {
 
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <BaseLayout className="p-6 max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Notifications</h1>
-          <p className="text-gray-600">Stay updated on your progress and team activities</p>
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Notifications</h1>
+          <p className="text-gray-600 dark:text-gray-300">Stay updated on your progress and team activities</p>
         </div>
 
         {unreadCount > 0 && (
           <button 
             onClick={handleMarkAllAsRead}
-            className="text-purple-600 font-medium hover:text-purple-700 transition-colors"
+            className="text-purple-600 dark:text-purple-400 font-medium hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
           >
             Mark all as read
           </button>
@@ -230,10 +231,11 @@ export const Notifications: React.FC = () => {
           <button
             key={filterOption.key}
             onClick={() => setFilter(filterOption.key as 'all' | 'unread' | 'achievements' | 'quests')}
-            className={`flex-shrink-0 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${filter === filterOption.key
-              ? 'bg-purple-100 text-purple-700'
-              : 'text-gray-600 hover:bg-gray-100'
-              }`}
+            className={`flex-shrink-0 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+              filter === filterOption.key
+                ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+            }`}
           >
             {filterOption.label}
           </button>
@@ -242,7 +244,7 @@ export const Notifications: React.FC = () => {
 
       {/* Loading State */}
       {isLoading && (!db || !userId) ? (
-        <div className="text-center py-12 text-gray-500">
+        <div className="text-center py-12 text-gray-500 dark:text-gray-400">
           <svg className="animate-spin h-6 w-6 mr-3 inline text-indigo-500" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -259,10 +261,11 @@ export const Notifications: React.FC = () => {
             return (
               <div
                 key={notification.id}
-                className={`bg-white rounded-lg p-4 shadow-sm border transition-all duration-200 hover:shadow-md ${notification.read
-                  ? 'border-gray-200'
-                  : 'border-purple-200 bg-gradient-to-r from-purple-50 to-white'
-                  }`}
+                className={`bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border transition-all duration-200 hover:shadow-md ${
+                  notification.read
+                    ? 'border-gray-200 dark:border-gray-700'
+                    : 'border-purple-200 dark:border-purple-500/30 bg-gradient-to-r from-purple-50 to-white dark:from-purple-900/20 dark:to-gray-800'
+                }`}
               >
                 <div className="flex items-start gap-4">
                   <div className={`p-2 rounded-full ${color}`}>
@@ -271,18 +274,22 @@ export const Notifications: React.FC = () => {
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between">
-                      <h3 className={`font-semibold ${notification.read ? 'text-gray-800' : 'text-gray-900'}`}>
+                      <h3 className={`font-semibold ${
+                        notification.read ? 'text-gray-800 dark:text-gray-200' : 'text-gray-900 dark:text-white'
+                      }`}>
                         {notification.title}
                       </h3>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500">{timeAgo}</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">{timeAgo}</span>
                         {!notification.read && (
                           <div className="w-2 h-2 bg-purple-500 rounded-full flex-shrink-0" title="Unread"></div>
                         )}
                       </div>
                     </div>
 
-                    <p className={`text-sm mt-1 ${notification.read ? 'text-gray-600' : 'text-gray-700'}`}>
+                    <p className={`text-sm mt-1 ${
+                      notification.read ? 'text-gray-600 dark:text-gray-300' : 'text-gray-700 dark:text-gray-200'
+                    }`}>
                       {notification.message}
                     </p>
 
@@ -291,7 +298,6 @@ export const Notifications: React.FC = () => {
                       {notification.type === 'social' && (
                         <>
                           <button
-                            // Calls the Accept handler which also marks the notification as read
                             onClick={() => {
                               if (notification.metadata?.teamId) {
                                 handleAcceptTeamInvite(notification.id, notification.metadata.teamId as string);
@@ -306,7 +312,7 @@ export const Notifications: React.FC = () => {
                           </button>
                           <button
                             onClick={() => handleMarkNotificationAsRead(notification.id)}
-                            className="border border-gray-300 text-gray-600 px-3 py-1 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+                            className="border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 px-3 py-1 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                           >
                             Decline
                           </button>
@@ -317,7 +323,7 @@ export const Notifications: React.FC = () => {
                       {notification.type === 'achievement' && (
                         <button 
                           onClick={() => handleMarkNotificationAsRead(notification.id)}
-                          className="text-purple-600 text-sm font-medium hover:text-purple-700 transition-colors"
+                          className="text-purple-600 dark:text-purple-400 text-sm font-medium hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
                         >
                           View Achievement
                         </button>
@@ -326,7 +332,7 @@ export const Notifications: React.FC = () => {
                       {notification.type === 'quest' && (
                         <button 
                           onClick={() => handleMarkNotificationAsRead(notification.id)}
-                          className="text-purple-600 text-sm font-medium hover:text-purple-700 transition-colors"
+                          className="text-purple-600 dark:text-purple-400 text-sm font-medium hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
                         >
                           Go to Quest
                         </button>
@@ -335,7 +341,7 @@ export const Notifications: React.FC = () => {
                       {notification.type === 'reminder' && (
                         <button 
                           onClick={() => handleMarkNotificationAsRead(notification.id)}
-                          className="text-purple-600 text-sm font-medium hover:text-purple-700 transition-colors"
+                          className="text-purple-600 dark:text-purple-400 text-sm font-medium hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
                         >
                           Complete Now
                         </button>
@@ -351,11 +357,11 @@ export const Notifications: React.FC = () => {
 
       {!isLoading && filteredNotifications.length === 0 && (
         <div className="text-center py-12">
-          <FaInbox className="mx-auto mb-4 text-4xl text-gray-300" />
-          <h3 className="text-lg font-medium text-gray-600 mb-2">No notifications</h3>
-          <p className="text-gray-500">You're all caught up! Keep building those habits.</p>
+          <FaInbox className="mx-auto mb-4 text-4xl text-gray-300 dark:text-gray-600" />
+          <h3 className="text-lg font-medium text-gray-600 dark:text-gray-300 mb-2">No notifications</h3>
+          <p className="text-gray-500 dark:text-gray-400">You're all caught up! Keep building those habits.</p>
         </div>
       )}
-    </div>
+    </BaseLayout>
   );
 };

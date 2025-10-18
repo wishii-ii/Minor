@@ -1,7 +1,6 @@
 import React, { useRef } from 'react';
 import { FaPlusCircle, FaFire, FaTrophy, FaUsers, FaFlagCheckered } from 'react-icons/fa';
 
-
 interface HomeProps {
   onAuth: (mode: 'signup' | 'login') => void;
 }
@@ -16,7 +15,7 @@ export const Home: React.FC<HomeProps> = ({ onAuth }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="max-w-6xl mx-auto px-4 py-20">
@@ -27,11 +26,11 @@ export const Home: React.FC<HomeProps> = ({ onAuth }) => {
               </div>
             </div>
 
-            <h1 className="text-6xl font-bold mb-6 bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 bg-clip-text text-transparent">
+            <h1 className="text-6xl font-bold mb-6 bg-gradient-to-r from-purple-400 via-indigo-400 to-purple-500 bg-clip-text text-transparent">
               HABITŌRA
             </h1>
 
-            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
               Build better days with HABITŌRA — create habits, earn XP, unlock badges,
               and team up for quests that make growth exciting
             </p>
@@ -39,20 +38,20 @@ export const Home: React.FC<HomeProps> = ({ onAuth }) => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 onClick={() => onAuth('signup')}
-                className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 hover:from-purple-600 hover:to-indigo-700"
               >
                 Sign Up
               </button>
               <button
                 onClick={() => onAuth('login')}
-                className="bg-white border-2 border-purple-300 text-purple-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-purple-50 transition-all duration-200"
+                className="bg-gray-800 border-2 border-purple-500/30 text-purple-400 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-700 hover:border-purple-400 transition-all duration-200"
               >
                 Log In
               </button>
               {/* Attach the scroll handler */}
               <button
                 onClick={handleScrollToFeatures}
-                className="border-2 border-purple-300 text-purple-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-purple-50 transition-all duration-200"
+                className="border-2 border-purple-500/30 text-purple-400 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-700 hover:border-purple-400 transition-all duration-200"
               >
                 Explore Features
               </button>
@@ -63,7 +62,7 @@ export const Home: React.FC<HomeProps> = ({ onAuth }) => {
 
       {/* Features Section - Attach the ref here */}
       <div ref={featuresRef} className="max-w-6xl mx-auto px-4 py-20">
-        <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">
+        <h2 className="text-3xl font-bold text-center mb-12 text-white">
           Turn Daily Goals Into Epic Adventures
         </h2>
 
@@ -105,10 +104,10 @@ const FeatureCard: React.FC<{
   description: string;
 }> = ({ icon, title, description }) => {
   return (
-    <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 border border-indigo-100">
-      <div className="text-purple-600 mb-4">{icon}</div>
-      <h3 className="font-bold text-lg mb-2 text-gray-800">{title}</h3>
-      <p className="text-gray-600 text-sm leading-relaxed">{description}</p>
+    <div className="bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 border border-indigo-500/20 hover:border-indigo-400/40">
+      <div className="text-purple-400 mb-4">{icon}</div>
+      <h3 className="font-bold text-lg mb-2 text-white">{title}</h3>
+      <p className="text-gray-300 text-sm leading-relaxed">{description}</p>
     </div>
   );
 };
