@@ -3,32 +3,50 @@ import { FaMedal, FaCheckCircle, FaFire, FaTrophy, FaCalendarCheck, FaCoins } fr
 import { useUser } from '../contexts/UserContext';
 import { useData } from '../contexts/DataContext';
 import { StatsWidget } from '../components/StatsWidget';
-import { HabitCard } from '../components/HabitCard';
 import { Habit } from '../types/models';
 
 export const Dashboard: React.FC = () => {
-  const { user, addXP } = useUser();
+  const { user } = useUser();
   const { habits, completeHabit } = useData();
 
-  const today = new Date().getDay();
+  const today = new Date().getDay(); // 0 = Sunday, 1 = Monday, etc.
   
+  // Get today's date in YYYY-MM-DD format for completion tracking
+  const todayDate = new Date().toISOString().split('T')[0];
+  
+  // Filter habits for today - include ALL active habits for now (you can add scheduling logic later)
   const todaysHabits = habits.filter((habit: Habit) => {
     if (!habit.isActive) return false;
+    
+    // If habit has scheduling, use it. Otherwise include all active habits
     const scheduledDays = (habit as any).schedule4Days || (habit as any).scheduledDays;
-    return scheduledDays?.includes(today);
+    if (scheduledDays && scheduledDays.length > 0) {
+      return scheduledDays.includes(today);
+    }
+    
+    // If no scheduling set, include habit for today
+    return true;
   });
 
-  const completedToday = todaysHabits.filter((habit: Habit) => habit.completedToday).length;
+  // Check if habit was completed today
+  const isHabitCompletedToday = (habit: Habit) => {
+    if (!habit.lastCompletedAt) return false;
+    const lastCompletedDate = new Date(habit.lastCompletedAt).toISOString().split('T')[0];
+    return lastCompletedDate === todayDate;
+  };
+
+  const completedToday = todaysHabits.filter(isHabitCompletedToday).length;
   const xpEarnedToday = todaysHabits
-    .filter((habit: Habit) => habit.completedToday)
-    .reduce((total, habit) => total + (habit.xpReward || 0), 0);
+    .filter(isHabitCompletedToday)
+    .reduce((total, habit) => total + (habit.xpReward || 50), 0);
 
   const handleCompleteHabit = async (habitId: string) => {
     const habit = habits.find((h: Habit) => h.id === habitId);
-    if (habit && !habit.completedToday) {
+    if (habit && !isHabitCompletedToday(habit)) {
       try {
         await completeHabit(habitId);
-        await addXP(habit.xpReward || 10);
+        // Note: completeHabit already calls addXP and addCoins in DataContext
+        // So we don't need to call them again here
       } catch (error) {
         console.error('Error completing habit:', error);
       }
@@ -79,13 +97,13 @@ export const Dashboard: React.FC = () => {
         </div>
         <p className="text-gray-600">
           {todaysHabits.length > 0 
-            ? `You have ${todaysHabits.length} habit${todaysHabits.length === 1 ? '' : 's'} scheduled for today.`
-            : 'No habits scheduled for today. Add some habits to start tracking your progress!'
+            ? `You have ${todaysHabits.length} habit${todaysHabits.length === 1 ? '' : 's'} to complete today.`
+            : 'No habits to complete today. Add some habits to start tracking your progress!'
           }
         </p>
       </div>
 
-      {/* Rest of your existing dashboard code */}
+      {/* Stats Widgets */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatsWidget
           icon={<FaMedal size={24} />}
@@ -133,17 +151,47 @@ export const Dashboard: React.FC = () => {
           <div className="grid gap-4">
             {todaysHabits.length > 0 ? (
               todaysHabits.map((habit: Habit) => (
-                <HabitCard
-                  key={habit.id}
-                  habit={habit}
-                  onComplete={() => handleCompleteHabit(habit.id)}
-                />
+                <div 
+                  key={habit.id} 
+                  className={`bg-white rounded-lg border-2 p-4 shadow-sm transition-all ${
+                    isHabitCompletedToday(habit) 
+                      ? 'border-green-500 bg-green-50' 
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-800 text-lg flex items-center gap-2">
+                        {habit.name}
+                        {isHabitCompletedToday(habit) && (
+                          <span className="text-green-500 text-sm">✓ Completed</span>
+                        )}
+                      </h3>
+                      <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                        <span>+{habit.xpReward || 50} XP</span>
+                        <span>+{habit.coinReward || 10} Coins</span>
+                        <span className="capitalize">{habit.frequency || 'daily'}</span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleCompleteHabit(habit.id)}
+                      disabled={isHabitCompletedToday(habit)}
+                      className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                        isHabitCompletedToday(habit)
+                          ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                          : 'bg-green-500 hover:bg-green-600 text-white'
+                      }`}
+                    >
+                      {isHabitCompletedToday(habit) ? 'Completed' : 'Complete'}
+                    </button>
+                  </div>
+                </div>
               ))
             ) : (
               <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
                 <FaCalendarCheck className="mx-auto text-gray-400 text-4xl mb-3" />
-                <p className="text-gray-500 text-lg font-medium">No habits scheduled for today</p>
-                <p className="text-sm text-gray-400 mt-1">Add habits to your schedule to see them here</p>
+                <p className="text-gray-500 text-lg font-medium">No habits for today</p>
+                <p className="text-sm text-gray-400 mt-1">Add habits to see them here</p>
               </div>
             )}
           </div>
