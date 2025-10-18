@@ -1,138 +1,153 @@
-import React, { useState } from 'react';
-import { FaTimes } from 'react-icons/fa';
-import { useData } from '../contexts/DataContext';
-
+import { useState } from "react";
+import { useData } from "../contexts/DataContext";
 
 interface CreateHabitModalProps {
   onClose: () => void;
 }
 
-export const CreateHabitModal: React.FC<CreateHabitModalProps> = ({ onClose }) => {
+export function CreateHabitModal({ onClose }: CreateHabitModalProps) {
   const { addHabit } = useData();
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    frequency: 'daily' as 'daily' | 'weekly',
-    category: 'wellness',
-    xpReward: 50
-  });
+  const [name, setName] = useState("");
+  const [frequency, setFrequency] = useState("daily");
+  const [customFrequency, setCustomFrequency] = useState("");
+  const [timesPerCompletion, setTimesPerCompletion] = useState(1);
+  const [xpReward, setXpReward] = useState(50);
+  const [coinReward, setCoinReward] = useState(10);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.title.trim()) {
-      addHabit({
-        // keep backwards compatibility: Habit.name is used elsewhere, map title -> name
-        name: formData.title,
-        ...formData,
-        isActive: true,
-        streak: 0,
-        completedToday: false,
-        completions: 0,
-        createdAt: new Date().toISOString()
-      });
-      onClose();
+    if (!name.trim()) return;
+
+    const habitData: any = {
+      name: name.trim(),
+      frequency,
+      timesPerCompletion,
+      xpReward,
+      coinReward,
+      completions: 0,
+    };
+
+    // Add custom frequency if set
+    if (frequency === "custom" && customFrequency) {
+      habitData.customFrequency = customFrequency;
     }
+
+    await addHabit(habitData);
+    onClose();
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl p-6 w-full max-w-md">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-gray-800">Create New Habit</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
-            aria-label="Close"
-          >
-            <FaTimes size={20} />
-          </button>
-        </div>
-
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 w-full max-w-md">
+        <h2 className="text-xl font-bold mb-4">Create New Habit</h2>
+        
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Habit Title
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Habit Name
             </label>
             <input
               type="text"
-              value={formData.title}
-              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-              placeholder="e.g., Morning meditation"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-lg"
+              placeholder="e.g., Exercise, Read, Meditate"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description
-            </label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-              placeholder="Optional description..."
-              rows={3}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Frequency
             </label>
             <select
-              value={formData.frequency}
-              onChange={(e) => setFormData(prev => ({ ...prev, frequency: e.target.value as 'daily' | 'weekly' }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              value={frequency}
+              onChange={(e) => setFrequency(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-lg"
             >
+              <option value="hourly">Hourly</option>
               <option value="daily">Daily</option>
               <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+              <option value="custom">Custom</option>
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Category
-            </label>
-            <select
-              value={formData.category}
-              onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-            >
-              <option value="wellness">Wellness</option>
-              <option value="fitness">Fitness</option>
-              <option value="learning">Learning</option>
-              <option value="productivity">Productivity</option>
-              <option value="social">Social</option>
-            </select>
-          </div>
+          {frequency === "custom" && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Custom Frequency
+              </label>
+              <input
+                type="text"
+                value={customFrequency}
+                onChange={(e) => setCustomFrequency(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-lg"
+                placeholder="e.g., 3 days, 2 weeks, 6 months"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Format: number + unit (e.g., "3 days", "2 weeks", "6 months")
+              </p>
+            </div>
+          )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              XP Reward
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Times per Completion
             </label>
             <input
               type="number"
-              value={formData.xpReward}
-              onChange={(e) => setFormData(prev => ({ ...prev, xpReward: parseInt(e.target.value) || 50 }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-              min="10"
-              max="500"
-              step="5"
+              min="1"
+              max="10"
+              value={timesPerCompletion}
+              onChange={(e) => setTimesPerCompletion(parseInt(e.target.value))}
+              className="w-full p-2 border border-gray-300 rounded-lg"
             />
+            <p className="text-xs text-gray-500 mt-1">
+              How many times you need to do this habit for one completion
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                XP Reward
+              </label>
+              <input
+                type="number"
+                min="10"
+                max="1000"
+                value={xpReward}
+                onChange={(e) => setXpReward(parseInt(e.target.value))}
+                className="w-full p-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Coin Reward
+              </label>
+              <input
+                type="number"
+                min="1"
+                max="100"
+                value={coinReward}
+                onChange={(e) => setCoinReward(parseInt(e.target.value))}
+                className="w-full p-2 border border-gray-300 rounded-lg"
+              />
+            </div>
           </div>
 
           <div className="flex gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-lg hover:shadow-lg transition-all duration-200"
+              className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
             >
               Create Habit
             </button>
@@ -141,4 +156,4 @@ export const CreateHabitModal: React.FC<CreateHabitModalProps> = ({ onClose }) =
       </div>
     </div>
   );
-};
+}

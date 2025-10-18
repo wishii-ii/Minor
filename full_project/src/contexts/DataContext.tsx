@@ -51,17 +51,20 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setQuests(mockQuests);
   }, []);
 
-  // 🔹 Add a habit
-  const addHabit = useCallback(async (habit: Partial<Habit>) => {
-    if (!user) return;
-    await addDoc(collection(db, "users", user.id, "habits"), {
-      name: habit.name ?? "Untitled",
-      createdAt: new Date().toISOString(),
-      isActive: true,
-      xpReward: habit.xpReward ?? 50,
-      ...habit,
-    });
-  }, [user]);
+  // In your addHabit function, update to include all properties:
+const addHabit = useCallback(async (habit: Partial<Habit>) => {
+  if (!user) return;
+  await addDoc(collection(db, "users", user.id, "habits"), {
+    name: habit.name ?? "Untitled",
+    frequency: habit.frequency ?? "daily",
+    timesPerCompletion: habit.timesPerCompletion ?? 1,
+    xpReward: habit.xpReward ?? 50,
+    coinReward: habit.coinReward ?? 10,
+    completions: 0,
+    createdAt: new Date().toISOString(),
+    isActive: true,
+  });
+}, [user]);
 
   // 🔹 Remove a habit
   const removeHabit = useCallback(async (id: string) => {
@@ -70,16 +73,23 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [user]);
 
   // 🔹 Complete a habit
+  // Replace your completeHabit function with this:
   const completeHabit = useCallback(async (id: string) => {
     if (!user) return;
-    const ref = doc(db, "users", user.id, "habits", id);
+  
+  const habit = habits.find(h => h.id === id);
+    if (!habit) return;
+
+  const ref = doc(db, "users", user.id, "habits", id);
     await updateDoc(ref, {
       completions: increment(1),
       lastCompletedAt: new Date().toISOString(),
-    });
-    await addXP(50);
-    await addCoins(10);
-  }, [user, addXP, addCoins]);
+  });
+  
+  // Use custom rewards if they exist, otherwise defaults
+    await addXP(habit.xpReward || 50);
+    await addCoins(habit.coinReward || 10);
+}, [user, addXP, addCoins, habits]);
 
   return (
     <DataContext.Provider value={{ habits, achievements, quests, addHabit, removeHabit, completeHabit }}>

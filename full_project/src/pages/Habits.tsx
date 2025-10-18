@@ -3,77 +3,173 @@ import { useData } from "../contexts/DataContext";
 import { CreateHabitModal } from "../components/CreateHabitModal";
 
 export default function Habits() {
-  const { habits, addHabit, removeHabit, completeHabit } = useData();
+  const { habits, removeHabit, completeHabit } = useData();
   const [showModal, setShowModal] = useState(false);
+  const [showReward, setShowReward] = useState(false);
+  const [completingId, setCompletingId] = useState<string | null>(null);
 
-  const handleAdd = () => {
-    setShowModal(true);
+  const handleComplete = async (id: string) => {
+    if (completingId) return; // Prevent spam
+    
+    setCompletingId(id);
+    await completeHabit(id);
+    setShowReward(true);
+    setTimeout(() => setShowReward(false), 2000);
+    setCompletingId(null);
+  };
+
+  const canCompleteAgain = (habit: any) => {
+    if (!habit.lastCompletedAt) return true;
+    
+    const now = new Date();
+    const lastCompleted = new Date(habit.lastCompletedAt);
+    const hoursSinceCompletion = (now.getTime() - lastCompleted.getTime()) / (1000 * 60 * 60);
+    
+    // Handle custom frequency with number + unit format
+    if (habit.customFrequency) {
+      const [value, unit] = habit.customFrequency.split(' ');
+      const numValue = parseInt(value);
+      
+      switch (unit) {
+        case 'hours':
+        case 'hour':
+          return hoursSinceCompletion >= numValue;
+        case 'days':
+        case 'day':
+          return hoursSinceCompletion >= numValue * 24;
+        case 'weeks':
+        case 'week':
+          return hoursSinceCompletion >= numValue * 168; // 7 days
+        case 'months':
+        case 'month':
+          return hoursSinceCompletion >= numValue * 720; // 30 days
+        default:
+          return hoursSinceCompletion >= 24; // Default to daily
+      }
+    }
+    
+    // Handle preset frequencies
+    switch (habit.frequency) {
+      case "hourly":
+        return hoursSinceCompletion >= 1;
+      case "daily":
+        return hoursSinceCompletion >= 24;
+      case "weekly":
+        return hoursSinceCompletion >= 168; // 7 days
+      case "monthly":
+        return hoursSinceCompletion >= 720; // 30 days
+      default:
+        return hoursSinceCompletion >= 24; // Default to daily
+    }
+  };
+
+  const formatFrequencyDisplay = (habit: any) => {
+    if (habit.customFrequency) {
+      return habit.customFrequency;
+    }
+    return habit.frequency || 'daily';
   };
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <header className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">Your Habits</h1>
-          <p className="text-sm text-gray-500">Track daily tasks and earn rewards for consistency.</p>
+      {/* Reward Notification */}
+      {showReward && (
+        <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-bounce">
+          🎉 +50 XP & +10 Coins!
         </div>
+      )}
 
-        <div className="flex items-center gap-3">
-          <button
-            onClick={handleAdd}
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-4 py-2 rounded-lg shadow hover:shadow-lg transition-all"
-          >
-            ➕ Add Habit
-          </button>
-          <button
-            onClick={() => {
-              // quick-add fallback for power users
-              const name = prompt("Quick add habit (name):");
-              if (name) addHabit({ name, frequency: "daily" });
-            }}
-            className="px-3 py-2 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50"
-          >
-            Quick Add
-          </button>
+      <header className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800">Habits</h1>
+          <p className="text-gray-600 mt-2">Build good habits and earn rewards</p>
         </div>
+        
+        <button
+          onClick={() => setShowModal(true)}
+          className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+        >
+          + Create Habit
+        </button>
       </header>
 
       <section>
         {habits.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-indigo-100 p-8 text-center text-gray-500">
-            No habits yet — create your first habit to begin earning XP and building streaks.
+          <div className="text-center py-12">
+            <div className="text-gray-400 text-6xl mb-4">📝</div>
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">No habits yet</h3>
+            <p className="text-gray-500">Create your first habit to start your journey!</p>
           </div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {habits.map((habit) => (
-              <article key={habit.id} className="bg-white rounded-xl p-4 shadow hover:shadow-lg transition-all border border-indigo-50">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="font-semibold text-gray-800 text-lg">{habit.name}</h3>
-                    <div className="text-sm text-gray-500 mt-1">{habit.frequency || 'daily'}</div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {habits.map((habit) => {
+              const canComplete = canCompleteAgain(habit);
+              const isCompleting = completingId === habit.id;
+              
+              return (
+                <div key={habit.id} className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+                  {/* Habit Header */}
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <h3 className="font-semibold text-gray-800 text-lg">{habit.name}</h3>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-sm text-gray-500 capitalize">
+                          {formatFrequencyDisplay(habit)}
+                        </span>
+                        {(habit.timesPerCompletion && habit.timesPerCompletion > 1) && (
+                          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                            {habit.timesPerCompletion}x per completion
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => removeHabit(habit.id)}
+                      className="text-gray-400 hover:text-red-500 transition-colors"
+                    >
+                      ×
+                    </button>
                   </div>
-                  <div className="text-right">
-                    <div className="text-sm text-gray-500">Completions</div>
-                    <div className="text-xl font-bold text-indigo-600">{habit.completions ?? 0}</div>
-                  </div>
-                </div>
 
-                <div className="mt-4 flex gap-2">
+                  {/* Progress & Rewards */}
+                  <div className="mb-4">
+                    <div className="flex justify-between text-sm text-gray-600 mb-1">
+                      <span>Progress</span>
+                      <span>{habit.completions || 0} completions</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-green-500 h-2 rounded-full transition-all"
+                        style={{ width: `${Math.min(((habit.completions || 0) / 10) * 100, 100)}%` }}
+                      ></div>
+                    </div>
+                    <div className="flex justify-between text-xs text-gray-500 mt-2">
+                      <span>+{habit.xpReward || 50} XP</span>
+                      <span>+{habit.coinReward || 10} Coins</span>
+                    </div>
+                  </div>
+
+                  {/* Action Button */}
                   <button
-                    onClick={() => completeHabit(habit.id)}
-                    className="flex-1 px-3 py-2 bg-green-50 text-green-700 rounded-lg border border-green-100 hover:bg-green-100 transition-colors"
+                    onClick={() => handleComplete(habit.id)}
+                    disabled={!canComplete || isCompleting}
+                    className={`w-full py-2 px-4 rounded-lg transition-colors font-medium ${
+                      canComplete && !isCompleting
+                        ? 'bg-green-500 hover:bg-green-600 text-white'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
                   >
-                    Complete
+                    {isCompleting ? 'Completing...' : canComplete ? '+ Complete' : 'Already Completed'}
                   </button>
-                  <button
-                    onClick={() => removeHabit(habit.id)}
-                    className="flex-1 px-3 py-2 bg-red-50 text-red-700 rounded-lg border border-red-100 hover:bg-red-100 transition-colors"
-                  >
-                    Delete
-                  </button>
+                  
+                  {!canComplete && habit.lastCompletedAt && (
+                    <p className="text-xs text-gray-500 mt-2 text-center">
+                      Next available: {new Date(habit.lastCompletedAt).toLocaleDateString()}
+                    </p>
+                  )}
                 </div>
-              </article>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>

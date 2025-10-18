@@ -18,13 +18,15 @@ export interface Habit {
   id: string;
   name?: string;
   title?: string;
-  frequency?: string;
+  frequency?: 'hourly' | 'daily' | 'weekly' | 'monthly' | string;
+  timesPerCompletion?: number;
+  xpReward?: number;
+  coinReward?: number;
   completions?: number;
   lastCompletedAt?: string | null;
   completedToday?: boolean;
   streak?: number;
   description?: string;
-  xpReward?: number;
   isActive?: boolean;
   createdAt?: string;
   category?: string;
