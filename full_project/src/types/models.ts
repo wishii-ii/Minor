@@ -67,21 +67,22 @@ export interface User {
   xpToNext: number;
   streakCount: number;
   joinDate: string;
-  status: 'online' | 'away' | 'offline';
+  status: string;
+  coins: number;
+  
+  // Friends functionality
+  friends?: string[]; // Array of friend user IDs
 
-  // virtual currency / coins used in Rewards
-  coins?: number;
-
-  // optional fields for richer profile handling
+  // Theme and profile settings
   theme?: 'light' | 'dark' | 'auto';
   publicProfile?: boolean;
   showOnLeaderboards?: boolean;
   activityStatus?: boolean;
 
-  // inventory + unlocks
+  // Inventory + unlocks
   purchasedRewardIds?: number[];
 
-  // additional metadata used in Dashboard & context
+  // Achievements and metadata
   achievements?: string[];
   lastLoginDate?: string;
   deleted?: boolean;
@@ -90,26 +91,12 @@ export interface User {
 
 export interface UserContextType {
   user: User | null;
-
-  // Update user fields in Firestore and local state
   updateUser: (updates: Partial<User>) => Promise<void>;
-
-  // Add XP and automatically handle level ups
   addXP: (amount: number) => Promise<void>;
-
-  // Spend coins; returns true if the purchase succeeds
   spendCoins: (amount: number) => Promise<boolean>;
-
-  // Add coins to the user's wallet
   addCoins: (amount: number) => Promise<void>;
-
-  // Record a purchased reward ID in user data
   addPurchaseId: (rewardId: number) => Promise<void>;
-
-  // Mark account deleted and sign out
   deleteAccount: () => Promise<void>;
-
-  // Authentication
   signIn: () => Promise<void>;
   signInWithAvatar: (avatar: string) => Promise<void>;
   signOut: () => Promise<void>;
