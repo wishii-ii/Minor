@@ -14,14 +14,19 @@ export interface Quest {
   status?: string;
 }
 
+// In src/types/models.ts - Update your Habit interface
 export interface Habit {
   id: string;
   name?: string;
   title?: string;
   frequency?: 'hourly' | 'daily' | 'weekly' | 'monthly' | string;
+  customFrequency?: string; // Add this
   timesPerCompletion?: number;
   xpReward?: number;
   coinReward?: number;
+  penaltyXP: number;
+  penaltyApplied: boolean;
+  lastPenaltyCheck?: string; // Add this
   completions?: number;
   lastCompletedAt?: string | null;
   completedToday?: boolean;
@@ -31,14 +36,38 @@ export interface Habit {
   createdAt?: string;
   category?: string;
   
-  // ADDED: Missing properties for scheduling
-  schedule4Days?: number[]; // Array of day numbers (0-6) when habit is scheduled
-  scheduledDays?: number[]; // Alternative property name
+  // Scheduling properties
+  schedule4Days?: number[];
+  scheduledDays?: number[];
   schedule?: {
     type: 'daily' | 'weekly' | 'custom';
-    days?: number[]; // For weekly: [0,1,2,3,4,5,6] where 0=Sunday
+    days?: number[];
     customSchedule?: any;
   };
+}
+
+// Make sure DataContextType includes all required methods
+export interface DataContextType {
+  habits: Habit[];
+  achievements: Achievement[];
+  quests: Quest[];
+  
+  // Habit operations
+  completeHabit: (habitId: string) => Promise<void>;
+  addHabit: (habit: Omit<Habit, 'id'>) => Promise<void>;
+  updateHabit: (habitId: string, updates: Partial<Habit>) => Promise<void>;
+  removeHabit: (habitId: string) => Promise<void>;
+  deleteHabit: (habitId: string) => Promise<void>;
+  
+  // Achievement operations
+  unlockAchievement: (achievementId: string) => Promise<void>;
+  
+  // Quest operations
+  updateQuestProgress: (questName: string, progress: number) => Promise<void>;
+  
+  // Loading states
+  loading: boolean;
+  error: string | null;
 }
 
 export interface Achievement {
